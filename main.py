@@ -18,11 +18,7 @@ def index():
 
 @app.route('/confirm/')
 def confirm():
-    dailyInformations = collection.find_one()
-    if dailyInformations:
-        dailyInformations['_id'] = str(dailyInformations['_id'])
-    # return jsonify(dailyInformations)
-    return jsonify({'dailyInformations':dailyInformations})
+    return jsonify({'dailyInformations':'chochooooo'})
 
 # @app.route('/onlyMongo')
 # def onlyMongo():
