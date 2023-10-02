@@ -1,13 +1,33 @@
 from flask import Flask, jsonify
-import os
+from myMongo.connection import collection
+from bson import ObjectId
+
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/')
 def index():
-    return jsonify({"Choo Choo": "Welcome to your Flask app 🚅"})
+    dailyInformations = collection.find_one()
+    if dailyInformations:
+        dailyInformations['_id'] = str(dailyInformations['_id'])
+    # return jsonify(dailyInformations)
+    return jsonify({'dailyInformations':dailyInformations})
+
+@app.route('/confirm/')
+def confirm():
+    dailyInformations = collection.find_one()
+    if dailyInformations:
+        dailyInformations['_id'] = str(dailyInformations['_id'])
+    # return jsonify(dailyInformations)
+    return jsonify({'dailyInformations':dailyInformations})
+
+# @app.route('/onlyMongo')
+# def onlyMongo():
+#     return jsonify(rotaDayData)
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=os.getenv("PORT", default=5000))
+    app.run(debug=True)
