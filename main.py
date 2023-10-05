@@ -4,6 +4,7 @@ from bson.objectid import ObjectId
 from flask_cors import CORS, cross_origin
 from verifiers.verifyRoteiro import  verifyAllItemsIsDone
 from pymongo.mongo_client import MongoClient
+from routes import loginsRoutes
 MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
 
 client = MongoClient(MONGO_URI)
@@ -13,6 +14,7 @@ db = client['pequi']
 collection = db['roteiro']
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'hellokitty'  # Defina uma chave secreta segura
 CORS(app)
 
 
@@ -25,8 +27,6 @@ def index():
     return jsonify({'routeInformations':routeInformations})
 
 # rota de confirmação de rota
-
-# rota de relatar problema
 
 @app.route('/confirm/<idRoteiro>/<int:idPedido>/<int:index>', methods=['PUT'])
 @cross_origin()
@@ -57,6 +57,8 @@ def confirm(idRoteiro, idPedido, index):
     except Exception as e:
         # Lida com outros erros que podem ocorrer durante o processamento
         return jsonify({'error': str(e)}), 500
+
+app.register_blueprint(loginsRoutes.bp, url_prefix = '/login')
 
 if __name__ == '__main__':
     app.run(debug=True)
