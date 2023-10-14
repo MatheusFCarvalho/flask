@@ -4,7 +4,11 @@ from bson.objectid import ObjectId
 from flask_cors import CORS, cross_origin
 from verifiers.verifyRoteiro import  verifyAllItemsIsDone
 from pymongo.mongo_client import MongoClient
-from routes import loginsRoutes
+from routes import loginsRoutes, crudRoutes
+from verifiers.verifyToken import token_required
+import requests
+from functions.getLoginWvetro import getTokenWvetro
+
 MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
 
 client = MongoClient(MONGO_URI)
@@ -20,7 +24,30 @@ CORS(app)
 
 @app.route('/')
 def index():
-    routeInformations = collection.find_one()
+    routeInformations = collection.find_one({'roteiroHoje':True})
+    roteiroId = routeInformations['idRoteiro']
+    roteiro = collection.find_one({'_id':roteiroId})
+    if roteiro:
+        roteiro['_id'] = str(roteiro['_id'])
+    # return jsonify(routeInformations)
+    return jsonify({'routeInformations':roteiro})
+
+@app.route('/setRoteiro/<idRoteiro>')
+def setRoteiro(idRoteiro):
+    try:
+        routeInformations = collection.find_one({'roteiroHoje':True})
+        print(routeInformations)
+        routeInformations['idRoteiro'] = ObjectId(idRoteiro)
+        print(routeInformations)
+        collection.update_one({'_id':routeInformations['_id']}, {'$set':routeInformations})
+        return jsonify({'deu': 'certo'})
+    except:
+        return jsonify({'error': 'id não encontrado'}), 401
+
+@app.route('/<int:roteiroId>')
+@token_required
+def specifRoute(roteiroId):
+    routeInformations = collection.find_one({'roteiroId':roteiroId})
     if routeInformations:
         routeInformations['_id'] = str(routeInformations['_id'])
     # return jsonify(routeInformations)
@@ -30,6 +57,7 @@ def index():
 
 @app.route('/confirm/<idRoteiro>/<int:idPedido>/<int:index>', methods=['PUT'])
 @cross_origin()
+@token_required
 def confirm(idRoteiro, idPedido, index):
     try:
         # import ipdb; ipdb.set_trace()
@@ -40,13 +68,10 @@ def confirm(idRoteiro, idPedido, index):
         items = roteiro['pedidos'][idPedido]['pedidos']
         if verifyAllItemsIsDone(items):
             roteiro['pedidos'][idPedido]['isDone'] = True
-
-        response = collection.update_one({'_id':roteiroId},{'$set':roteiro})
-        # Faça o que você precisa com os dados
-        print(response)
+        
+        collection.update_one({'_id':roteiroId},{'$set':roteiro})
 
         newRoteiro = roteiro
-        
         newRoteiro['_id'] = str(newRoteiro['_id'])
 
         response_data = {'message': 'Dados recebidos com sucesso', 'newRoteiro':newRoteiro}
@@ -58,7 +83,38 @@ def confirm(idRoteiro, idPedido, index):
         # Lida com outros erros que podem ocorrer durante o processamento
         return jsonify({'error': str(e)}), 500
 
+
+@app.route('/problem/<idRoteiro>/<idPedido>', methods=['PUT'])
+@cross_origin()
+@token_required
+def problem(idRoteiro, idPedido):
+    try:
+        data = request.get_json()  # Obtenha os dados JSON do corpo da solicitação
+
+        messageError = data.get('messageError')  # Acesse 'messageError' dos dados JSON
+        
+        roteiroId = ObjectId(idRoteiro)
+        roteiro = collection.find_one({'_id':roteiroId})
+        roteiro['pedidos'][int(idPedido)]['messagesError'].append(messageError)
+        roteiro['pedidos'][int(idPedido)]['isError'] = True
+        
+        collection.update_one({'_id':roteiroId},{'$set':roteiro})
+
+        newRoteiro = roteiro
+        newRoteiro['_id'] = str(newRoteiro['_id'])
+
+        response_data = {'message': 'Dados recebidos com sucesso', 'newRoteiro':newRoteiro}
+        return jsonify(response_data), 200
+    except KeyError:
+        # Se algum dos campos estiver faltando no corpo da requisição, retorne um erro
+        return jsonify({'error': 'Campos ausentes no corpo da requisição'}), 400
+    except Exception as e:
+        # Lida com outros erros que podem ocorrer durante o processamento
+        return jsonify({'error': str(e)}), 500
+
+
 app.register_blueprint(loginsRoutes.bp, url_prefix = '/login')
+app.register_blueprint(crudRoutes.bp, url_prefix = '/cruds')
 
 if __name__ == '__main__':
     app.run(debug=True)

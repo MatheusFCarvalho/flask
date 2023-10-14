@@ -6,6 +6,7 @@ import datetime
 import bcrypt
 from flask import request, jsonify, request, Blueprint
 from verifiers.verifyToken import token_required
+from bson.objectid import ObjectId
 
 # Função para verificar se o usuário está autenticado
 
@@ -46,14 +47,27 @@ def login():
         token = jwt.encode({
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=5),
             'iat':datetime.datetime.utcnow(),
-            'sub': usuario, 
+            'sub': usuario['_id'],
              }, key='hellokitty', algorithm='HS256')
 
-        return jsonify({'token': token})
+
+        return jsonify({'token': token}), 201
 
     return jsonify({'message': 'Credenciais inválidas'}), 401
 
 # Rota protegida que requer autenticação (mantida da implementação anterior)
+
+@bp.route('/getMyUser')
+@token_required
+def getInfoUser():
+    data = request.get_json()  # Obtenha os dados JSON do corpo da solicitação
+
+    userId = data.get('userId')  # Acesse 'messageError' dos dados JSON
+    user = collection.find_one({'_id':ObjectId(userId)})
+
+    return jsonify({'userInfo': user})
+
+
 @bp.route('/protegida')
 @token_required
 def protegida():
