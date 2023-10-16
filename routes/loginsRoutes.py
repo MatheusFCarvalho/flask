@@ -7,6 +7,7 @@ import bcrypt
 from flask import request, jsonify, request, Blueprint
 from verifiers.verifyToken import token_required
 from bson.objectid import ObjectId
+from flask_cors import CORS
 
 # Função para verificar se o usuário está autenticado
 
@@ -16,6 +17,7 @@ db = client['pequi']
 collection = db['usuarios']
 
 bp = Blueprint('logs', __name__)
+CORS(bp)
 
 # Rota para cadastro de usuário
 @bp.route('/registro', methods=['POST'])
@@ -39,9 +41,8 @@ def registrar_usuario():
 @bp.route('/', methods=['POST'])
 def login():
     data = request.get_json()
-    
-    usuario = collection.find_one({'username': data['username']})
 
+    usuario = collection.find_one({'username': data['username']})
     if usuario and bcrypt.checkpw(data['password'].encode('utf-8'), usuario['password'].encode('utf-8')):
         usuario['_id'] = str(usuario['_id'])
         token = jwt.encode({
@@ -50,21 +51,20 @@ def login():
             'sub': usuario['_id'],
              }, key='hellokitty', algorithm='HS256')
 
+        userId = str(usuario['_id'])
 
-        return jsonify({'token': token}), 201
+        return jsonify({'token': token, 'userId':userId}), 201
 
     return jsonify({'message': 'Credenciais inválidas'}), 401
 
 # Rota protegida que requer autenticação (mantida da implementação anterior)
 
-@bp.route('/getMyUser')
+@bp.route('/getMyUser/<userId>')
 @token_required
-def getInfoUser():
-    data = request.get_json()  # Obtenha os dados JSON do corpo da solicitação
-
-    userId = data.get('userId')  # Acesse 'messageError' dos dados JSON
+def getInfoUser(userId):
     user = collection.find_one({'_id':ObjectId(userId)})
-
+    user['id'] = user.pop('_id')
+    user['id'] = str(user['id'])
     return jsonify({'userInfo': user})
 
 

@@ -11,6 +11,7 @@ from bson.objectid import ObjectId
 import requests
 from flask_cors import CORS, cross_origin
 from functions.getLoginWvetro import getTokenWvetro
+from functions.documentsMaker import parse_text_to_mongodb_doc
 
 # Função para verificar se o usuário está autenticado
 
@@ -31,6 +32,7 @@ def getAllRoteiro():
                 '_id': 0,  # Exclui o campo '_id' original
                 'id': '$_id',  # Renomeia '_id' para 'id'
                 'data': 1,
+                # 'title': 1,
                 'roteiroId': 1
             }
         }
@@ -46,6 +48,26 @@ def getAllRoteiro():
     # Retorne a lista como uma resposta JSON
     return jsonify(resultado)
 
+
+
+@bp.route('/oneRoteiro/<idRoteiro>', methods=['GET'])
+def retornarRoteiro(idRoteiro):
+    try:
+        roteiroId = ObjectId(idRoteiro)
+        roteiro = collection.find_one({'_id':roteiroId})
+        roteiro['_id'] = str(roteiro['_id'])
+        roteiro['id'] = roteiro.pop('_id')
+        print(roteiro)
+        return roteiro
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+
+@bp.route('/createByExcelText')
+def createByExcelText():
+    text = request.body()
+    document = parse_text_to_mongodb_doc(text)
+    return document
 
 @bp.route('/create', methods=['POST'])
 def criarRoteiro():
@@ -137,17 +159,3 @@ def deleteOrder(idRoteiro):
     roteiro['id'] = str(roteiro['id'])
     
     return jsonify(roteiro)
-
-@bp.route('/oneRoteiro/<idRoteiro>', methods=['GET'])
-def retornarRoteiro(idRoteiro):
-    try:
-        roteiroId = ObjectId(idRoteiro)
-        roteiro = collection.find_one({'_id':roteiroId})
-        roteiro['_id'] = str(roteiro['_id'])
-        roteiro['id'] = roteiro.pop('_id')
-        print(roteiro)
-        return roteiro
-    except Exception as e:
-        return jsonify({'error': str(e)})
-
-
