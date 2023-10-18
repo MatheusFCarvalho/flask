@@ -1,16 +1,8 @@
-from flask import Flask, request, jsonify
 from pymongo.mongo_client import MongoClient
-from flask_pymongo import PyMongo
-import jwt
-import datetime
-import bcrypt
 from flask import request, jsonify, request, Blueprint
 from verifiers.verifyToken import token_required
-from verifiers.verifyRoteiro import verifyIfClientAlreadyExist
 from bson.objectid import ObjectId
-import requests
 from flask_cors import CORS, cross_origin
-from functions.getLoginWvetro import getTokenWvetro
 from functions.documentsMaker import parse_text_to_mongodb_doc
 from verifiers.verifyRoteiro import  verifyAllItemsIsDoneExcel, verifyIfCanAddRequest
 from dotenv import load_dotenv
