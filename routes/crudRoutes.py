@@ -12,10 +12,14 @@ import requests
 from flask_cors import CORS, cross_origin
 from functions.getLoginWvetro import getTokenWvetro
 from functions.documentsMaker import parse_text_to_mongodb_doc
+from dotenv import load_dotenv
+import os
 
-# Função para verificar se o usuário está autenticado
+# Carregue as variáveis de ambiente do arquivo .env
+load_dotenv()
 
-MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
+MONGO_URI = os.getenv("MONGO_URI")
+
 client = MongoClient(MONGO_URI)
 db = client['pequi']
 collection = db['roteiro']
@@ -63,11 +67,6 @@ def retornarRoteiro(idRoteiro):
         return jsonify({'error': str(e)})
 
 
-@bp.route('/createByExcelText')
-def createByExcelText():
-    text = request.body()
-    document = parse_text_to_mongodb_doc(text)
-    return document
 
 @bp.route('/create', methods=['POST'])
 def criarRoteiro():
