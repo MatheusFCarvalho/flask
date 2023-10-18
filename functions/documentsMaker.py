@@ -22,7 +22,7 @@ def parse_text_to_mongodb_doc(text):
 
         if current_delivery is not None:
             parts = line.split("\t")
-            if len(parts) >= 5:
+            if len(parts) >= 6:
                 # import ipdb; ipdb.set_trace()
                 cliente = parts[0]
                 pedido = int(parts[1])
@@ -37,6 +37,7 @@ def parse_text_to_mongodb_doc(text):
                     item = {
                         "cliente": cliente,
                         "pedidos": [pedido],
+                        "pedidosFeito":[],
                         "pecas": pecas,
                         "endereco": endereco,
                         "obs": obs,
@@ -61,4 +62,4 @@ def parse_text_to_mongodb_doc(text):
         "total_pecas": total_pecas
     }
 
-    return json.dumps(mongodb_doc, indent=2)
+    return mongodb_doc

@@ -5,6 +5,24 @@ def verifyAllItemsIsDone(items):
         elif not item['isDone'] == True:
             return False
     return True
+def verifyIfCanAddRequest(pedido, number):
+    if number in pedido['pedidos'] and number not in pedido['pedidosFeito']:
+        return True
+    return False
+
+def verifyAllItemsIsDoneExcel(pedido):
+    pedidos = pedido['pedidos']
+    pedidosFeito = pedido['pedidosFeito']
+
+    if len(pedidos) == len(pedidosFeito):
+        for pedid in pedidos:
+            if not pedid in pedidosFeito:
+                return False
+        for pedid in pedidosFeito:
+            if not pedid in pedidos:
+                return False
+        return True
+    return False
 
 def verifyIfClientAlreadyExist(roteiro, pedido):
         boolzin = False

@@ -4,24 +4,34 @@ from bson.objectid import ObjectId
 from flask_cors import CORS, cross_origin
 from verifiers.verifyRoteiro import  verifyAllItemsIsDone
 from pymongo.mongo_client import MongoClient
-from routes import loginsRoutes, crudRoutes
+from routes import loginsRoutes, crudRoutes, excelRoutes
 from verifiers.verifyToken import token_required
 import requests
 from functions.getLoginWvetro import getTokenWvetro
+from dotenv import load_dotenv
+import os
 
-MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
+# Carregue as variáveis de ambiente do arquivo .env
+load_dotenv()
 
+MONGO_URI = os.getenv("MONGO_URI")
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+# Conectar ao MongoDB
 client = MongoClient(MONGO_URI)
 
 db = client['pequi']
 
 collection = db['roteiro']
+collecctionExcel = db['route']
+
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'hellokitty'  # Defina uma chave secreta segura
+app.config['SECRET_KEY'] = SECRET_KEY  # Defina uma chave secreta segura
+# CORS(app)
 CORS(app)
 
-
+# DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED
 @app.route('/')
 def index():
     routeInformations = collection.find_one({'roteiroHoje':True})
@@ -31,6 +41,8 @@ def index():
         roteiro['_id'] = str(roteiro['_id'])
     # return jsonify(routeInformations)
     return jsonify({'routeInformations':roteiro})
+# DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED DEPRECATED
+
 
 @app.route('/setRoteiro/<idRoteiro>')
 def setRoteiro(idRoteiro):
@@ -115,6 +127,7 @@ def problem(idRoteiro, idPedido):
 
 app.register_blueprint(loginsRoutes.bp, url_prefix = '/login')
 app.register_blueprint(crudRoutes.bp, url_prefix = '/cruds')
+app.register_blueprint(excelRoutes.bp, url_prefix = '/excels')
 
 if __name__ == '__main__':
     app.run(debug=True)

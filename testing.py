@@ -38,6 +38,7 @@ def parse_text_to_mongodb_doc(text):
                     item = {
                         "cliente": cliente,
                         "pedidos": [pedido],
+                        "pedidosFeito":[],
                         "pecas": pecas,
                         "endereco": endereco,
                         "obs": obs,
@@ -82,6 +83,20 @@ CAVALCANTE 	23057	1		RUA BENEDITO FERNANDES DE ANDRADE - 65	LIBERADO
 MARCENARIA JOSEENSE 	23148	2		RUA HELEODORA PEREIRA LEMES - 77 	RECEBER
 """
 
-mongodb_doc = parse_text_to_mongodb_doc(text)
-print(mongodb_doc)
+# mongodb_doc = parse_text_to_mongodb_doc(text)
+# print(mongodb_doc)
+# from pymongo.mongo_client import MongoClient
+# from bson.objectid import ObjectId
 
+# MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
+# client = MongoClient(MONGO_URI)
+# db = client['pequi']
+# collection = db['usuarios']
+
+# userId = ObjectId('651f06b25a14ba6cead36a05')
+# user = collection.find_one({'_id':userId})
+# user['isAdmin'] = True
+# collection.update_one({'_id':userId},{'$set':user})
+
+# collectionGuide = db['guideLiner']
+# collectionGuide.insert_one({'guideOf':'route', 'routeId':routeId})

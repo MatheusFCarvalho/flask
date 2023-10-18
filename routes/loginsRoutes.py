@@ -8,11 +8,17 @@ from flask import request, jsonify, request, Blueprint
 from verifiers.verifyToken import token_required
 from bson.objectid import ObjectId
 from flask_cors import CORS
+from dotenv import load_dotenv
+import os
 
-# Função para verificar se o usuário está autenticado
+# Carregue as variáveis de ambiente do arquivo .env
+load_dotenv()
 
-MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
+MONGO_URI = os.getenv("MONGO_URI")
+
+# Conectar ao MongoDB
 client = MongoClient(MONGO_URI)
+
 db = client['pequi']
 collection = db['usuarios']
 
@@ -65,6 +71,7 @@ def getInfoUser(userId):
     user = collection.find_one({'_id':ObjectId(userId)})
     user['id'] = user.pop('_id')
     user['id'] = str(user['id'])
+    user.pop('password')
     return jsonify({'userInfo': user})
 
 
