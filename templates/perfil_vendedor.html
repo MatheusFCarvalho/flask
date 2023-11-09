@@ -9,25 +9,41 @@
     <div class="container mt-4">
         <div class="card">
             <div class="card-header">
-                <h1 class="card-title">Perfil do Vendedor {{ nome }}</h1>
+                <h1 class="card-title">Perfil {{ nome }}</h1>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <h4>Nome: </h4>
-                        <p>Total Vendido: {{ totalVendido }}</p>
-                        <p>Quantidade de Vendas: {{ qtdVendas }}</p>
-                        <p>Quantidade de Portas: {{ qtdPortas }}</p>
-                        <p>Clientes Atendidos: <a data-toggle="collapse" href="#clientesCollapse" aria-expanded="false" aria-controls="clientesCollapse">({{ qtdClientes }})</a></p>
-                        <div class="collapse" id="clientesCollapse">
-                            <ul>
-                                {% for chave in clientesName %}
-                                    <li>
-                                        {{ chave }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
+                        <!-- <h4>Nome: </h4> -->
+                        
+                        <!-- Campo de senha para o usuário inserir -->
+                        {% if senha != senhaSystem[nome] %}
+                        <form method="post">
+                            <label for="senha">Senha: </label>
+                            <input type="password" id="senha" name="senha" required>
+                            <button type="submit">Acessar</button>
+                        </form>
+                        {% endif%}
+                        <!-- Verificar a senha antes de exibir os dados -->
+                        {% if request.method == 'POST' %}
+                            {% if senha == senhaSystem[nome] %}
+                                <p>Total Vendido: {{ totalVendido }}</p>
+                                <p>Quantidade de Vendas: {{ qtdVendas }}</p>
+                                <p>Quantidade de Portas: {{ qtdPortas }}</p>
+                                <p>Clientes Atendidos: <a data-toggle="collapse" href="#clientesCollapse" aria-expanded="false" aria-controls="clientesCollapse">({{ qtdClientes }})</a></p>
+                                <div class="collapse" id="clientesCollapse">
+                                    <ul>
+                                        {% for chave in clientesName %}
+                                            <li>
+                                                {{ chave }}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% else %}
+                                <p>Acesso negado. Senha incorreta.</p>
+                            {% endif %}
+                        {% endif %}
                         
                     </div>
                     <div class="col-md-6">
