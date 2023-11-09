@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Administração de Vendedores</title>
+    <!-- Adicione o link para o Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        {% for vendedor in dados_vendedores %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h1 class="card-title">{{ vendedor['nome'] }}</h1>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>Total Vendido: {{ vendedor['totalVendido'] }}</p>
+                        <p>Quantidade de Vendas: {{ vendedor['qtdVendas'] }}</p>
+                        <p>Quantidade de Portas: {{ vendedor['qtdPortas'] }}</p>
+                        <p>Clientes Atendidos: <a data-toggle="collapse" href="#clientesCollapse{{ loop.index }}" aria-expanded="false" aria-controls="clientesCollapse{{ loop.index }}">({{ vendedor['qtdClientes'] }})</a></p>
+                        <div class="collapse" id="clientesCollapse{{ loop.index }}">
+                            <ul>
+                                {% for chave in vendedor['clientesName'] %}
+                                    <li>
+                                        {{ chave }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>Ranks:</h4>
+                        <p>Top Patrimônio: {{ vendedor['rank_value'] }}º</p>
+                        <p>Top Número de Vendas: {{ vendedor['rank_vendedor'] }}º</p>
+                        <p>Top Porteiro: {{ vendedor['rank_porteiro'] }}º</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Adicione o link para o Bootstrap JS e jQuery se necessário -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

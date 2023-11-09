@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Perfil do Vendedor</title>
+    <!-- Adicione o link para o Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Perfil do Vendedor</h1>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Nome: {{ nome }}</h4>
+                        <p>Total Vendido: {{ totalVendido }}</p>
+                        <p>Quantidade de Vendas: {{ qtdVendas }}</p>
+                        <p>Quantidade de Portas: {{ qtdPortas }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>Ranks:</h4>
+                        <p>Top patrimonio: {{ rank_value }}º</p>
+                        <p>Top Nmr Vendas: {{ rank_vendedor }}º</p>
+                        <p>Top Porteiro: {{ rank_porteiro }}º</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Adicione o link para o Bootstrap JS e jQuery se necessário -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

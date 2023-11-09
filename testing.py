@@ -100,3 +100,61 @@ MARCENARIA JOSEENSE 	23148	2		RUA HELEODORA PEREIRA LEMES - 77 	RECEBER
 
 # collectionGuide = db['guideLiner']
 # collectionGuide.insert_one({'guideOf':'route', 'routeId':routeId})
+
+
+def testing(str):
+    arr = []
+    for s in str:
+        arr.append(s)
+    for n,pos in enumerate(arr):
+        arr[n] = pos
+    print(arr)
+# testing('batata')
+def testing2(str):
+    for s in str:
+        str += str
+    print(str)
+# testing2('batata')
+
+def testing3(str):
+    for s in str:
+        str = str.replace(s,str)
+        print(len(str))
+# testing3('12434')
+
+def testArr(arr):
+    for ind, elem in enumerate(arr):
+        arr[ind] = str(arr)  # Convert the individual element to a string
+
+    save = ''.join(arr)
+    print(save)
+    print(len(save))
+
+testArr([2, 1, 3])
+
+
+# import plotly.express as px
+
+# data = {
+#     "1": {
+#         "data": "2023/01",
+#         "tatiane brockyeld": {"totalVendido": 110236.62, "qtdVendas": 200},
+#         "michelle boschetti": {"totalVendido": 148429.63, "qtdVendas": 144},
+#         "juliana madeira": {"totalVendido": 280.26, "qtdVendas": 1},
+#         "luciana rocha": {"totalVendido": 48293.60, "qtdVendas": 43},
+#         "bianca boschetti": {"totalVendido": 24794.81, "qtdVendas": 41},
+#     }
+# }
+
+# # Extrair os nomes dos vendedores e os totais vendidos
+# vendors = []
+# totals = []
+# for vendor, info in data["1"].items():
+#     if vendor != "data":
+#         vendors.append(vendor)
+#         totals.append(info["totalVendido"])
+
+# fig = px.bar(data_frame=data, x=vendors, y=totals, title="Total Vendido por Vendedor em Janeiro de 2023")
+# fig.update_xaxes(title_text="Vendedor")
+# fig.update_yaxes(title_text="Total Vendido")
+# fig.show()

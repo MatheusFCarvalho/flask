@@ -4,7 +4,7 @@ from verifiers.verifyToken import token_required
 from bson.objectid import ObjectId
 from flask_cors import CORS, cross_origin
 from functions.documentsMaker import parse_text_to_mongodb_doc
-from verifiers.verifyRoteiro import  verifyAllItemsIsDoneExcel, verifyIfCanAddRequest
+from verifiers.verifyRoteiro import  verifyAllItemsIsDoneExcel, verifyIfCanAddRequest, verifyIfExcelAreRight
 from dotenv import load_dotenv
 import os
 
@@ -25,11 +25,17 @@ CORS(bp, resources={r"/": {"origins": "http://localhost:3000"}})
 
 @bp.route('/create' ,methods=['POST'])
 def createByExcelText():
+
     text = request.json['exceldata']
-    document = parse_text_to_mongodb_doc(text)
-    result = collection.insert_one(document)
-    routeId = str(result.inserted_id)
-    return routeId
+
+    if verifyIfExcelAreRight(text):
+        document = parse_text_to_mongodb_doc(text)
+        result = collection.insert_one(document)
+        routeId = str(result.inserted_id)
+        return routeId
+    else:
+        error_message = "Erro: os dados do Excel não estão corretos."
+        return jsonify({'error': error_message}), 400
 
 
 @bp.route('/' ,methods=['GET'])
