@@ -23,15 +23,6 @@ bp = Blueprint('excels', __name__)
 CORS(bp, resources={r"/": {"origins": "http://localhost:3000"}})
 
 
-@bp.route('/create' ,methods=['POST'])
-def createByExcelText():
-    text = request.json['exceldata']
-    document = parse_text_to_mongodb_doc(text)
-    result = collection.insert_one(document)
-    routeId = str(result.inserted_id)
-    return routeId
-
-
 @bp.route('/' ,methods=['GET'])
 @cross_origin(origin='*')
 def getRoute():
@@ -43,6 +34,15 @@ def getRoute():
         roteiro['id'] = roteiro.pop('_id')
     # return jsonify(routeInformations)
     return jsonify({'routeInformations':roteiro})
+
+@bp.route('/create' ,methods=['POST'])
+def createByExcelText():
+    text = request.json['exceldata']
+    document = parse_text_to_mongodb_doc(text)
+    result = collection.insert_one(document)
+    routeId = str(result.inserted_id)
+    return routeId
+
 
 
 

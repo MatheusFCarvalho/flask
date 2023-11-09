@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Chat PCP</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="mt-5">Chat PCP</h1>
+        <div id="chat" class="mt-3">
+            <ul id="pcp_messages" class="list-group"></ul>
+            <input id="pcp_message_input" class="form-control" autocomplete="off" />
+            <button id="pcp_send" class="btn btn-primary mt-2">Enviar</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port + '/webChat');
+        var pcp_message_input = document.getElementById("pcp_message_input");
+        var pcp_send_button = document.getElementById("pcp_send");
+        var pcp_messages = document.getElementById("pcp_messages");
+
+        pcp_send_button.onclick = function () {
+            socket.emit('pcp_message', pcp_message_input.value);
+            pcp_message_input.value = '';
+        };
+
+        socket.on('pcp_message', function (message) {
+            var li = document.createElement('li');
+            li.className = "list-group-item";
+            li.appendChild(document.createTextNode(message));
+            pcp_messages.appendChild(li);
+        });
+    </script>
+</body>
+
+</html>

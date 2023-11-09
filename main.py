@@ -1,7 +1,7 @@
 import json
 from flask import Flask
 from flask_cors import CORS
-from routes import loginsRoutes, excelRoutes
+from routes import loginsRoutes, excelRoutes, webChatRoutes
 from dotenv import load_dotenv
 import os
 
@@ -16,6 +16,7 @@ CORS(app)
 
 app.register_blueprint(loginsRoutes.bp, url_prefix = '/login')
 app.register_blueprint(excelRoutes.bp, url_prefix = '/excels')
+app.register_blueprint(webChatRoutes.bp, url_prefix = '/webChat')
 
 if __name__ == '__main__':
     app.run(debug=True)
