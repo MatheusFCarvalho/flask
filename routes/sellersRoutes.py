@@ -21,6 +21,7 @@
 #     else:
 #         # Se o vendedor não for encontrado, você pode lidar com isso de acordo com sua lógica, como exibir uma mensagem de erro.
 #         return "Vendedor não encontrado", 404
+from functions.generateRanking import updateRanking
 from flask import render_template, Blueprint, request
 from pymongo import MongoClient
 
@@ -36,9 +37,11 @@ def perfil_vendedor(nome):
     # Obter o documento do banco de dados
     documento = vendedores_collection.find_one({})
 
+
     if documento and nome in documento:
         # Se o nome do vendedor existe no documento, pegue os dados desse vendedor
         vendedor = documento[nome]
+        updateInfo = {'lastUpdate':documento['lastUpdate'], 'updatedBy': documento['updatedBy']}
         # Formate o valor totalVendido como moeda com 2 casas decimais e o símbolo "R$"
         totalVendidoFormatado = f'R$ {vendedor.get("totalVendido", 0):,.2f}'
         clientes = vendedor.get("clientes", [])
@@ -60,10 +63,21 @@ def perfil_vendedor(nome):
 
         }
 
+        fraseSystem = {
+            'michelle boschetti':'calma na alma que passa',
+            'beatriz boschetti':'obrigado meu Deus pelo cafézinho de cada dia',
+            'bianca boschetti':'assina aqui por favor',
+            'fernando boschetti':'golfão gti: https://www.youtube.com/watch?v=AA3__qlakw4',
+            'valter souza':'surf na praia é bom d++',
+            'willian souza':'sistema novo?', 
+            'luciana rocha':'cuidado com o fuá',
+            'tatiane brockyeld':'hmmm coquinha gelada bom d++++',
+        }
+
         senha = request.form.get('senha')
-        if request.method == 'POST':
-            if senha == senhaSystem.get(nome):
-                dados_vendedor = {
+        # if request.method == 'POST':
+            # if senha == senhaSystem.get(nome):
+        dados_vendedor = {
                     "nome": nome,
                     "senhaSystem": senhaSystem,
                     "totalVendido": totalVendidoFormatado,
@@ -76,14 +90,16 @@ def perfil_vendedor(nome):
                     "rank_porteiro": vendedor.get("rank_porteiro", 0),
                     "rank_value": vendedor.get("rank_value", 0),
                     "rank_cliente": vendedor.get("rank_cliente", 0),
-                    "senha": senha  # Passa a senha para o template
+                    "frase": fraseSystem[nome],
+                    "senha": senha, 
+                    "updateInfo": updateInfo,
                 }
-            else:
-                # Se a senha estiver incorreta, passe apenas o nome e a senha
-                dados_vendedor = {"nome": nome, "senha": "", "acesso_negado": True, "senhaSystem": senhaSystem}
-        else:
-            # Se não for uma solicitação POST, passe apenas o nom
-            dados_vendedor = {"nome": nome, "senha": "","senhaSystem": senhaSystem }
+        #     else:
+        #         # Se a senha estiver incorreta, passe apenas o nome e a senha
+        #         dados_vendedor = {"nome": nome, "senha": "", "acesso_negado": True, "senhaSystem": senhaSystem}
+        # else:
+        #     # Se não for uma solicitação POST, passe apenas o nom
+        #     dados_vendedor = {"nome": nome, "senha": "","senhaSystem": senhaSystem }
         return render_template('perfil_vendedor.html', **dados_vendedor)
     else:
         # Se o vendedor não for encontrado, você pode lidar com isso de acordo com sua lógica, como exibir uma mensagem de erro.
@@ -131,3 +147,15 @@ def admin():
     dados_vendedores = sorted(dados_vendedores, key=lambda x: x['rank_value'], reverse=False)[1:]
     # Passe a lista de dados_vendedores para o template de administração
     return render_template('admin.html', dados_vendedores=dados_vendedores)
+
+
+from flask import request, redirect, url_for
+
+# ...
+@bp.route('/<nome>/atualizar_sistema', methods=['POST'])
+def atualizar_sistema(nome):
+    # Adicione aqui a lógica de atualização do sistema usando a função updateRanking()
+    updateRanking(nome)
+
+    # Redirecione de volta ao perfil do vendedor após a atualização
+    return redirect(url_for('sellers.perfil_vendedor', nome=nome))
