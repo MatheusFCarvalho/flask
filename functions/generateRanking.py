@@ -20,7 +20,8 @@ def get_current_month_data(base_url, headers, db, updater = 'Gerencia',reset = F
     if reset or not existing_data:
         documentOfTime = {'data': f'{year}/{formatted_month}',
                             'pedidosId': [],
-                            'clientesDb':{}}
+                            'clientesDb':{}
+                            }
 
     else:
         documentOfTime = existing_data
@@ -183,7 +184,7 @@ def generate_ranking(data):
 
 def updateRanking(nome):
     base_url = 'https://sistema.wvetro.com.br/wvetro/rest/api/'
-    token = getTokenWvetro()
+    token = getLoginWvetro.getTokenWvetro()
     headers = {'token': token}
     MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
     client = MongoClient(MONGO_URI)
