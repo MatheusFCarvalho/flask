@@ -218,5 +218,5 @@ if __name__ == "__main__":
     client = MongoClient(MONGO_URI)
     client = client['pequi']
     db = client['vendedores']
-    result = get_current_month_data(base_url, headers, db, updater = 'pcp', specificData=True, year=2023, month=10)
+    result = get_current_month_data(base_url, headers, db, updater = 'pcp', specificData=True, year=2023, month=8)
     print(result)

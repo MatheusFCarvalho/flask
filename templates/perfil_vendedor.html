@@ -13,9 +13,10 @@
                 <h1 class="card-title">Perfil {{ nome }}</h1>
             </div>
             <div class="card-body">
+                <h4>pcp do dia: {{frase}} </h4>
                 <div class="row">
-                    <div class="col-md-6">
-                        <h4>pcp do dia: {{frase}} </h4>
+                    <div class="col-md-4 border-right border-primary">
+                        <H5>Mês atual - faltam {{daysLeft}} para acabar</H5>
                         <p>Total Vendido: {{ totalVendido }}</p>
                         <p>Quantidade de Vendas: {{ qtdVendas }}</p>
                         <p>Quantidade de Portas: {{ qtdPortas }}</p>
@@ -23,14 +24,33 @@
                         <div class="collapse" id="clientesCollapse">
                             <ul>
                                 {% for chave in clientesName %}
-                                    <li>
-                                        {{ chave }}
-                                    </li>
+                                <li>
+                                    {{ chave }}
+                                </li>
                                 {% endfor %}
                             </ul>
                         </div>                        
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4 border-right border-primary">
+                        <select class="form-control" id="selectMes" name="meses" onchange="changeData()">
+                            <option value="">Selecione um mês</option>
+                            {% for mes in mesesDisponiveis %}
+                                <option value="{{ mes }}">{{ mes }}</option>
+                            {% endfor %}
+                        </select>
+                        <div id="dadosVendedor" style="display: none;">
+                            <p id="totalVendido"></p>
+                            <p id="qtdVendas"></p>
+                            <p id="qtdPortas"></p>
+                            <p id="qtdClientes"></p>
+                            <div id="clientesCollapse" class="collapse">
+                                <ul id="clientesList">
+                                    <!-- Lista de clientes -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
                         <h4>Ranks:</h4>
                         <p>Top Patrimônio: {{ rank_value }}º</p>
                         <p>Top Número de Vendas: {{ rank_vendedor }}º</p>
@@ -48,6 +68,42 @@
         </div>
     </div>
     <!-- Adicione o link para o Bootstrap JS e jQuery se necessário -->
+    <script>
+            var mesesData = {{ mesesData | tojson }};
+        function changeData() {
+            var select = document.getElementById("selectMes");
+            var selectedMonth = select.value;
+            console.log(mesesData)
+            if (selectedMonth !== "") {
+                var dadosVendedor = mesesData[selectedMonth]; // Assume-se que 'mesesData' contém os dados
+                dadosVendedor['qtdClientes'] = dadosVendedor['clientes'].length
+
+                var totalVendidoFormatado = dadosVendedor.totalVendido.toLocaleString('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL'
+                            });
+    
+                document.getElementById('totalVendido').innerText = "Total Vendido: " + totalVendidoFormatado;
+                document.getElementById('qtdVendas').innerText = "Quantidade de Vendas: " + dadosVendedor.qtdVendas;
+                document.getElementById('qtdPortas').innerText = "Quantidade de Portas: " + dadosVendedor.qtdPortas;
+                document.getElementById('qtdClientes').innerHTML = "Clientes Atendidos: <a data-toggle='collapse' href='#clientesCollapse' aria-expanded='false' aria-controls='clientesCollapse'>(" + dadosVendedor.qtdClientes + ")</a>";
+    
+                var clientesList = document.getElementById('clientesList');
+                clientesList.innerHTML = ""; // Limpa a lista de clientes
+                dadosVendedor.clientes.forEach(function(cliente) {
+                    var li = document.createElement('li');
+                    li.textContent = cliente;
+                    clientesList.appendChild(li);
+                });
+    
+                // Exibir os dados
+                document.getElementById('dadosVendedor').style.display = 'block';
+            } else {
+                // Esconder os dados se nenhum mês for selecionado
+                document.getElementById('dadosVendedor').style.display = 'none';
+            }
+        }
+    </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
