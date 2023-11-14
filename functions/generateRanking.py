@@ -1,4 +1,4 @@
-from myvetro import getLoginWvetro
+# from myvetro import getLoginWvetro
 # from examples import exampleOfClientesDb    
 from pymongo.mongo_client import MongoClient
 import requests
@@ -7,30 +7,32 @@ from pymongo import MongoClient
 import copy
 import datetime
 
+def getDocumentOfTimeAndUrl(base_url, db, reset, specificData, year, month):
+    if not specificData:
+        today = datetime.date.today()
+        year = today.year
+        month = today.month
+        formatted_month = f'{month:02d}'
+        existing_data = db.find_one({"data": f'{year}/{formatted_month}'})
+    else:
+        formatted_month = f'{month:02d}'
+        existing_data = db.find_one({"data": f'{year}/{formatted_month}'})
 
-def get_current_month_data(base_url, headers, db, updater = 'Gerencia',reset = False):
 
-    today = datetime.date.today()
-    year = today.year
-    month = today.month
-    formatted_month = f'{month:02d}'
-
-    existing_data = db.find_one({"data": f'{year}/{formatted_month}'})
-    relatoryUpdate = {}
     if reset or not existing_data:
         documentOfTime = {'data': f'{year}/{formatted_month}',
                             'pedidosId': [],
                             'clientesDb':{}
                             }
-
     else:
         documentOfTime = existing_data
-
-    staticDocumentOfPast = copy.deepcopy(documentOfTime) 
-    # Construa a URL para a requisição com base no mês atual
     url = f'{base_url}Pedidos/ListPedidos?Dtvendainicial={year}-{formatted_month}-01&Dtvendafinal={year}-{formatted_month}-31'
+    return documentOfTime, url
 
-    # Faça a requisição
+def get_current_month_data(base_url, headers, db, updater = 'Gerencia',reset = False, specificData=False, year=None, month=None):
+
+    documentOfTime, url = getDocumentOfTimeAndUrl(base_url, db, reset, specificData, year, month)
+
     response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
@@ -196,15 +198,25 @@ def updateRanking(nome):
     
 # Exemplo de uso:
 if __name__ == "__main__":
+    # base_url = 'https://sistema.wvetro.com.br/wvetro/rest/api/'
+    # # token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVc2VyIjoibWF0aGV1cyBmbG9yZW50aW5vIGRlIGNhcnZhbGhvIiwiTGljZW5zZSI6IjI0NzkiLCJleHAiOjE2OTk0NzMyMDIsImlhdCI6MTY5OTQ3MzIwMiwianRpIjoiYmUwZTM3ZmMtMjQ0MC00YTFkLWI4NjktYjM1YmIxZTM0MjlhIiwiUGFzc3dvcmQiOiIxMjM0NTYifQ.NMf6vNrMf100hhClbO_2pfLKWWAvuWLqI0spWtGE4Js'
+    # token = getLoginWvetro.getTokenWvetro()
+    # headers = {'token': token}
+    # MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
+    # client = MongoClient(MONGO_URI)
+    # client = client['pequi']
+    # db = client['vendedores']
+    # reset = True
+
+    # result = get_current_month_data(base_url, headers, db, updater='matheusin')
+    # print(result)
+
     base_url = 'https://sistema.wvetro.com.br/wvetro/rest/api/'
-    # token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVc2VyIjoibWF0aGV1cyBmbG9yZW50aW5vIGRlIGNhcnZhbGhvIiwiTGljZW5zZSI6IjI0NzkiLCJleHAiOjE2OTk0NzMyMDIsImlhdCI6MTY5OTQ3MzIwMiwianRpIjoiYmUwZTM3ZmMtMjQ0MC00YTFkLWI4NjktYjM1YmIxZTM0MjlhIiwiUGFzc3dvcmQiOiIxMjM0NTYifQ.NMf6vNrMf100hhClbO_2pfLKWWAvuWLqI0spWtGE4Js'
-    token = getLoginWvetro.getTokenWvetro()
+    token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVc2VyIjoibWF0aGV1cyBmbG9yZW50aW5vIGRlIGNhcnZhbGhvIiwiTGljZW5zZSI6IjI0NzkiLCJleHAiOjE2OTk5NjYwMTYsImlhdCI6MTY5OTk2NjAxNiwianRpIjoiYmUwZTM3ZmMtMjQ0MC00YTFkLWI4NjktYjM1YmIxZTM0MjlhIiwiUGFzc3dvcmQiOiIxMjM0NTYifQ.6RUFmmeUzVbU7i2n1r42n6M987YMNUhzLM2X0IIjA4c"
     headers = {'token': token}
     MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
     client = MongoClient(MONGO_URI)
     client = client['pequi']
     db = client['vendedores']
-    reset = True
-
-    result = get_current_month_data(base_url, headers, db, updater='matheusin')
+    result = get_current_month_data(base_url, headers, db, updater = 'pcp', specificData=True, year=2023, month=10)
     print(result)
