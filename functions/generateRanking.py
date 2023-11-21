@@ -1,4 +1,4 @@
-# from myvetro import getLoginWvetro
+from myvetro import getLoginWvetro
 # from examples import exampleOfClientesDb    
 from pymongo.mongo_client import MongoClient
 import requests
