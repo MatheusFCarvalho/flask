@@ -1,5 +1,5 @@
 from functions.examples import getDateSlashed
-from functions.generateRanking import updateRanking
+from functions.generateRanking import updateRanking, generateSpecificRanking
 from flask import render_template, Blueprint, request
 from pymongo import MongoClient
 from functions.serializers import getDadosVendedoresFromDocumentoForAdmin, getMesesDisponiveis
@@ -55,13 +55,15 @@ def perfil_vendedor(nome):
             'tatiane brockyeld':'hmmm coquinha gelada bom d++++',
         }
 
+
         senha = request.form.get('senha')
         # if request.method == 'POST':
             # if senha == senhaSystem.get(nome):
         mesesDisponiveis, mesesData = getMesesDisponiveis(nome)
-
+        # he wake up early nine he
         today = datetime.date.today()
         daysLeft = 30 - int(today.day)
+        
 
         dados_vendedor = {
                     "nome": nome,
@@ -83,7 +85,6 @@ def perfil_vendedor(nome):
                     "daysLeft":daysLeft
                     # "mesesData": mesesData,
                 }
-
 
         return render_template('perfil_vendedor.html', mesesData = mesesData, **dados_vendedor)
     else:
@@ -116,6 +117,14 @@ from flask import request, redirect, url_for
 def atualizar_sistema(nome):
     # Adicione aqui a lógica de atualização do sistema usando a função updateRanking()
     updateRanking(nome)
+
+    # Redirecione de volta ao perfil do vendedor após a atualização
+    return redirect(url_for('sellers.perfil_vendedor', nome=nome))
+
+@bp.route('/<nome>/atualizar_sistema/specific/<year>/<month>', methods=['POST'])
+def generate_specific_ranking(nome, year, month):
+    # Adicione aqui a lógica de atualização do sistema usando a função updateRanking()
+    generateSpecificRanking(nome= nome, year=year, month=month)
 
     # Redirecione de volta ao perfil do vendedor após a atualização
     return redirect(url_for('sellers.perfil_vendedor', nome=nome))

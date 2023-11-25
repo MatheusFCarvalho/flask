@@ -1,4 +1,4 @@
-# from myvetro import getLoginWvetro
+from myvetro import getLoginWvetro
 # from examples import exampleOfClientesDb    
 from pymongo.mongo_client import MongoClient
 import requests
@@ -7,8 +7,8 @@ from pymongo import MongoClient
 import copy
 import datetime
 
-def getDocumentOfTimeAndUrl(base_url, db, reset, specificData, year, month):
-    if not specificData:
+def getDocumentOfTimeAndUrl(base_url, db, reset, year, month):
+    if not year or not month:
         today = datetime.date.today()
         year = today.year
         month = today.month
@@ -25,13 +25,13 @@ def getDocumentOfTimeAndUrl(base_url, db, reset, specificData, year, month):
                             'clientesDb':{}
                             }
     else:
-        documentOfTime = existing_data
+        documentOfTime = existing_data  
     url = f'{base_url}Pedidos/ListPedidos?Dtvendainicial={year}-{formatted_month}-01&Dtvendafinal={year}-{formatted_month}-31'
     return documentOfTime, url
 
-def get_current_month_data(base_url, headers, db, updater = 'Gerencia',reset = False, specificData=False, year=None, month=None):
+def get_current_month_data(base_url, headers, db, updater = 'Gerencia',reset = False, year=None, month=None):
 
-    documentOfTime, url = getDocumentOfTimeAndUrl(base_url, db, reset, specificData, year, month)
+    documentOfTime, url = getDocumentOfTimeAndUrl(base_url, db, reset, year, month)
 
     response = requests.get(url, headers=headers)
 
@@ -50,6 +50,7 @@ def get_current_month_data(base_url, headers, db, updater = 'Gerencia',reset = F
                 documentOfTime['pedidosId'].append(nroPedido)
                 documentOfTime = addBasicData(documentOfTime, pedido, vendedorName, clientName)
                 documentOfTime = addPortaDados(documentOfTime, pedido, vendedorName)
+                
 
         # Gere o ranking
 
@@ -64,7 +65,7 @@ def get_current_month_data(base_url, headers, db, updater = 'Gerencia',reset = F
 
         return "Dados coletados, tratados e atualizados com sucesso."
     else:
-        return f'Requisição falhou com o código de status: {response.status_code}'
+        return f'Requisição falhou com o cVódigo de status: {response.status_code}'
 
 def generateRelatoryOfUpdate(documentOfTime, staticDocumentOfPast):
     qtd_pedidos = len(documentOfTime['pedidosId']) - len(staticDocumentOfPast['pedidosId'])
@@ -128,12 +129,15 @@ def addPercentageCliente(documentOfTime):
         total_value = sum(absolute_values.values())
     
         percentage_values = {}
-
-        for seller, value in absolute_values.items():
-                percentage = (value / total_value) * 100
-                percentage_values[seller] = round(percentage, 2)  # Arredonda para 2 casas decimais
-        
-        documentOfTime['clientesDb'][clientKey]['percentageValues'] = percentage_values
+        if not total_value == 0:
+            for seller, value in absolute_values.items():
+                    if not value == 0:
+                        percentage = (value / total_value) * 100
+                    else:
+                        percentage = 0
+                    percentage_values[seller] = round(percentage, 2)  # Arredonda para 2 casas decimais
+            
+            documentOfTime['clientesDb'][clientKey]['percentageValues'] = percentage_values
 
     return documentOfTime
 
@@ -182,7 +186,7 @@ def generate_ranking(data):
 
         rank += 1
 
-    return data
+    return data     
 
 def updateRanking(nome):
     base_url = 'https://sistema.wvetro.com.br/wvetro/rest/api/'
@@ -193,6 +197,18 @@ def updateRanking(nome):
     client = client['pequi']
     db = client['vendedores']
     result = get_current_month_data(base_url, headers, db, updater = nome)
+    print(result)
+
+    
+def generateSpecificRanking(nome, year, month):
+    base_url = 'https://sistema.wvetro.com.br/wvetro/rest/api/'
+    token = getLoginWvetro.getTokenWvetro()
+    headers = {'token': token}
+    MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
+    client = MongoClient(MONGO_URI)
+    client = client['pequi']
+    db = client['vendedores']
+    result = get_current_month_data(base_url, headers, db, updater = nome, year=year, month= month)
     print(result)
 
     

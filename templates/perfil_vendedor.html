@@ -52,9 +52,9 @@
                     </div>
                     <div class="col-md-4">
                         <h4>Ranks:</h4>
-                        <p>Top Patrimônio: {{ rank_value }}º</p>
-                        <p>Top Número de Vendas: {{ rank_vendedor }}º</p>
-                        <p>Top Porteiro: {{ rank_porteiro }}º</p>
+                        <p id="topPatrimonio">Top Patrimônio: {{ rank_value }}º</p>
+                        <p id="topVendas">Top Número de Vendas: {{ rank_vendedor }}º</p>
+                        <p id="topPorteiro">Top Porteiro: {{ rank_porteiro }}º</p>
                         <form action="{{ url_for('sellers.atualizar_sistema', nome=nome) }}" method="post">
                             <input type="submit" value="Atualizar Sistema">
                             <hr>
@@ -87,7 +87,12 @@
                 document.getElementById('qtdVendas').innerText = "Quantidade de Vendas: " + dadosVendedor.qtdVendas;
                 document.getElementById('qtdPortas').innerText = "Quantidade de Portas: " + dadosVendedor.qtdPortas;
                 document.getElementById('qtdClientes').innerHTML = "Clientes Atendidos: <a data-toggle='collapse' href='#clientesCollapse' aria-expanded='false' aria-controls='clientesCollapse'>(" + dadosVendedor.qtdClientes + ")</a>";
-    
+                
+                document.getElementById('topPatrimonio').innerText = "Top patrimônio: " + dadosVendedor.rank_value + "º";
+                document.getElementById('topVendas').innerText = "Top número de vendas: " + dadosVendedor.rank_vendedor + "º";
+                document.getElementById('topPorteiro').innerText = "Top porteiro: " + dadosVendedor.rank_porteiro + "º";
+
+
                 var clientesList = document.getElementById('clientesList');
                 clientesList.innerHTML = ""; // Limpa a lista de clientes
                 dadosVendedor.clientes.forEach(function(cliente) {
