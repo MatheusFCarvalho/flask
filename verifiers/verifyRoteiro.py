@@ -37,8 +37,8 @@ def verifyIfClientAlreadyExist(roteiro, pedido):
 
 def verifyIfExcelAreRight(roteiro):
     isError = False
-    import ipdb;
-    ipdb.set_trace()
+    # import ipdb;
+    # ipdb.set_trace()
     lines = roteiro.split('\n')[2:]
     for line in lines:
         datas = line.split('\t')

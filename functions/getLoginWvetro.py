@@ -5,4 +5,3 @@ def getTokenWvetro():
     response = requests.get(url)
     responseData = response.json()
     return responseData['ValidaUsuario']['token']
-

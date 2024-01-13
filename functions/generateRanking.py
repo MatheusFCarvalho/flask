@@ -33,7 +33,7 @@ def get_current_month_data(base_url, headers, db, updater = 'Gerencia',reset = F
 
     documentOfTime, url = getDocumentOfTimeAndUrl(base_url, db, reset, year, month)
 
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers = headers)
 
     if response.status_code == 200:
         # Trate os dados da resposta
@@ -99,9 +99,7 @@ def addBasicData(documentOfTime, pedido, vendedorName, clientName):
         documentOfTime[vendedorName]['qtdVendas'] += 1
         if not clientName in documentOfTime[vendedorName]['clientes']:
             documentOfTime[vendedorName]['clientes'].append(clientName)
-
-
-
+            
     return documentOfTime
 
 def createBasicClient(vendedorName, totalVenda):
@@ -159,6 +157,7 @@ def generate_ranking(data):
         ranking_valor.append((vendedor, datas["totalVendido"]))
         ranking_cliente.append((vendedor, len(datas["clientes"])))
 
+
     # Ordenar as listas de acordo com os diferentes critérios
     ranking_vendedor.sort(key=lambda x: x[1], reverse=True)
     ranking_porteiro.sort(key=lambda x: x[1], reverse=True)
@@ -188,7 +187,7 @@ def generate_ranking(data):
 
     return data     
 
-def updateRanking(nome):
+def updateRanking(nome, reset = False):
     base_url = 'https://sistema.wvetro.com.br/wvetro/rest/api/'
     token = getLoginWvetro.getTokenWvetro()
     headers = {'token': token}
@@ -196,7 +195,7 @@ def updateRanking(nome):
     client = MongoClient(MONGO_URI)
     client = client['pequi']
     db = client['vendedores']
-    result = get_current_month_data(base_url, headers, db, updater = nome)
+    result = get_current_month_data(base_url, headers, db, reset=reset, updater = nome)
     print(result)
 
     

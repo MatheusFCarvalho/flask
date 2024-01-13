@@ -16,7 +16,7 @@
                 <h4>pcp do dia: {{frase}} </h4>
                 <div class="row">
                     <div class="col-md-4 border-right border-primary">
-                        <H5>Mês atual - faltam {{daysLeft}} para acabar</H5>
+                        <h5>Mês atual - faltam {{daysLeft}} para acabar</h5>
                         <p>Total Vendido: {{ totalVendido }}</p>
                         <p>Quantidade de Vendas: {{ qtdVendas }}</p>
                         <p>Quantidade de Portas: {{ qtdPortas }}</p>
@@ -50,6 +50,7 @@
                             </div>
                         </div>
                     </div>
+                    {% if isPacific != 'pacifico' %}
                     <div class="col-md-4">
                         <h4>Ranks:</h4>
                         <p id="topPatrimonio">Top Patrimônio: {{ rank_value }}º</p>
@@ -63,6 +64,7 @@
                             <span>Atualizado em: {{ updateInfo['lastUpdate'] }}</span>
                         </form>
                     </div>
+                {% endif %}
                 </div>
             </div>
         </div>
@@ -70,6 +72,8 @@
     <!-- Adicione o link para o Bootstrap JS e jQuery se necessário -->
     <script>
             var mesesData = {{ mesesData | tojson }};
+            var isPacific = {{ isPacific|tojson|safe }};
+
         function changeData() {
             var select = document.getElementById("selectMes");
             var selectedMonth = select.value;
@@ -88,10 +92,12 @@
                 document.getElementById('qtdPortas').innerText = "Quantidade de Portas: " + dadosVendedor.qtdPortas;
                 document.getElementById('qtdClientes').innerHTML = "Clientes Atendidos: <a data-toggle='collapse' href='#clientesCollapse' aria-expanded='false' aria-controls='clientesCollapse'>(" + dadosVendedor.qtdClientes + ")</a>";
                 
-                document.getElementById('topPatrimonio').innerText = "Top patrimônio: " + dadosVendedor.rank_value + "º";
-                document.getElementById('topVendas').innerText = "Top número de vendas: " + dadosVendedor.rank_vendedor + "º";
-                document.getElementById('topPorteiro').innerText = "Top porteiro: " + dadosVendedor.rank_porteiro + "º";
-
+                if (!isPacific){
+                    document.getElementById('topPatrimonio').innerText = "Top patrimônio: " + dadosVendedor.rank_value + "º";
+                    document.getElementById('topVendas').innerText = "Top número de vendas: " + dadosVendedor.rank_vendedor + "º";
+                    document.getElementById('topPorteiro').innerText = "Top porteiro: " + dadosVendedor.rank_porteiro + "º";
+                }
+                    
 
                 var clientesList = document.getElementById('clientesList');
                 clientesList.innerHTML = ""; // Limpa a lista de clientes

@@ -26,6 +26,7 @@ def getDadosVendedoresFromDocumentoForAdmin(documento):
                 clientesDb = documento.get("clientesDb", {})
                 qtdClient = len(clientes)
                 clientesDbOfSeller = {cliente: clientesDb.get(cliente) for cliente in clientes}
+                
 
                 # Crie um dicionário de dados_vendedor para este vendedor
                 dados_vendedor = {

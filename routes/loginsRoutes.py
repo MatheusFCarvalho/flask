@@ -33,16 +33,16 @@ def registrar_usuario():
     if collection.find_one({'username': data['username']}):
         return jsonify({'message': 'Nome de usuário já está em uso!'}), 400
 
+
     # Faça o hash da senha
     hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
-
     # Crie um novo usuário com a senha hasheada
     data['password'] = hashed_password.decode('utf-8')
     collection.insert_one(data)
 
     return jsonify({'message': 'Usuário registrado com sucesso!'}), 201
 
-# Rota para fazer login e obter um token JWT (mantida da implementação anterior)
+# Rota para fazer login e obter um token JWT (mantida da implementação anterior) 
 @bp.route('/', methods=['POST'])
 def login():
     data = request.get_json()
@@ -61,8 +61,8 @@ def login():
         return jsonify({'token': token, 'userId':userId}), 201
 
     return jsonify({'message': 'Credenciais inválidas'}), 401
-
 # Rota protegida que requer autenticação (mantida da implementação anterior)
+
 
 @bp.route('/getMyUser/<userId>')
 @token_required

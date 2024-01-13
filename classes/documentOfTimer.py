@@ -1,3 +1,5 @@
+import datetime    
+
 class Vendor:
     def __init__(self, name):
         self.name = name
@@ -27,9 +29,27 @@ class Vendor:
         )
 
 class ReportGenerator:
+
     def __init__(self):
         self.vendors = {}
         self.pedidosId = []
+
+    def getAllPedidos(self,db, year = None, month=None):
+        if not year or not month:
+
+            today = datetime.date.today()
+            year = today.year
+            month = today.month
+            formatted_month = f'{month:02d}'
+            existing_data = db.find_one({"data": f'{year}/{formatted_month}'})
+        else:
+            formatted_month = f'{month:02d}'
+            existing_data = db.find_one({"data": f'{year}/{formatted_month}'})
+            
+            self.wvUrl = f'https://sistema.wvetro.com.br/wvetro/rest/api/Pedidos/ListPedidos?Dtvendainicial={year}-{formatted_month}-01&Dtvendafinal={year}-{formatted_month}-31'
+
+
+    
 
     def process_single_pedido(self, pedido):
         nro_pedido = pedido['Nro']
@@ -61,7 +81,6 @@ class ReportGenerator:
             if vendedor in ignoreFields:
                 continue
             # import ipdb; ipdb.set_trace()
-            
             ranking_vendedor.append((vendedor, vendedorData["qtdVendas"]))
             ranking_porteiro.append((vendedor, vendedorData["qtdPortas"]))
             ranking_valor.append((vendedor, vendedorData["totalVendido"]))
@@ -91,7 +110,8 @@ class ReportGenerator:
         # Your ranking generation logic here
         pass
 
-    def process_all_pedidos(self, all_pedidos):
+    def process_all_pedidos(self):
+        allPedidos = self.getAllPedidos()
         for pedido in all_pedidos:
             self.process_single_pedido(pedido)
 

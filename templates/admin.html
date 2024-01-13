@@ -7,6 +7,13 @@
 </head>
 <body>
     <div class="container mt-4">
+        <form action="{{ url_for('sellers.atualizar_sistema', nome='admin') }}" method="post">
+            <input type="submit" value="Atualizar Sistema">
+            -
+            <span>Atualizado por: {{ updateInfo['updatedBy'] }}</span>
+            -
+            <span>Atualizado em: {{ updateInfo['lastUpdate'] }}</span>
+        </form>
         {% for vendedor in dados_vendedores %}
         <div class="card mb-4">
             <div class="card-header">

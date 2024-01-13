@@ -9,7 +9,9 @@ bp = Blueprint('sellers', __name__)
 MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
 
 @bp.route('/<nome>', methods=['GET', 'POST'])
-def perfil_vendedor(nome):
+@bp.route('/<nome>/<isPacific>', methods=['GET', 'POST'])
+def perfil_vendedor(nome, isPacific='pacifico'):
+    
     # Conectar ao banco de dados MongoDB
     client = MongoClient(MONGO_URI)
     db = client['pequi']
@@ -30,19 +32,8 @@ def perfil_vendedor(nome):
         qtdClient = len(clientes)
         
         clientesDbOfSeller = {cliente: clientesDb.get(cliente) for cliente in clientes}
-        
-        # Passe os dados como um dicionário com as chaves correspondentes
-        senhaSystem = {
-            'michelle boschetti':'golden',
-            'beatriz boschetti':'senhora',
-            'bianca boschetti':'',
-            'fernando boschetti':'golf',
-            'valter souza':'esfola',
-            'willian souza':'sistema', 
-            'luciana rocha':'fua',
-            'tatiane brockyeld':'cocacola',
 
-        }
+        # Passe os dados como um dicionário com as chaves correspondentes
 
         fraseSystem = {
             'michelle boschetti':'calma na alma que passa',
@@ -64,10 +55,13 @@ def perfil_vendedor(nome):
         today = datetime.date.today()
         daysLeft = 30 - int(today.day)
         
+        frase = "De grão em grão de areia se faz uma chapa de vidro!"
+        if nome in fraseSystem:
+            frase = fraseSystem[nome]
 
         dados_vendedor = {
+                    "isPacific":isPacific,
                     "nome": nome,
-                    "senhaSystem": senhaSystem,
                     "totalVendido": totalVendidoFormatado,
                     "qtdVendas": vendedor.get("qtdVendas", 0),
                     "qtdPortas": vendedor.get("qtdPortas", 0),
@@ -78,7 +72,7 @@ def perfil_vendedor(nome):
                     "rank_porteiro": vendedor.get("rank_porteiro", 0),
                     "rank_value": vendedor.get("rank_value", 0),
                     "rank_cliente": vendedor.get("rank_cliente", 0),
-                    "frase": fraseSystem[nome],
+                    "frase": frase,
                     "senha": senha, 
                     "updateInfo": updateInfo,
                     "mesesDisponiveis": mesesDisponiveis,
@@ -107,16 +101,25 @@ def admin(year=None, month=None):
 
     documento = vendedores_collection.find_one({"data": formated_date})
     dados_vendedores = getDadosVendedoresFromDocumentoForAdmin(documento)
-
-    return render_template('admin.html', dados_vendedores=dados_vendedores)
+    updateInfo = {'lastUpdate':documento['lastUpdate'], 'updatedBy': documento['updatedBy']}
+                
+    return render_template('admin.html',updateInfo=updateInfo, dados_vendedores=dados_vendedores)
 
 from flask import request, redirect, url_for
 
 # ...
-@bp.route('/<nome>/atualizar_sistema', methods=['POST'])
+@bp.route('/<nome>/atualizar_sistema', methods=['POST', 'GET'])
 def atualizar_sistema(nome):
     # Adicione aqui a lógica de atualização do sistema usando a função updateRanking()
     updateRanking(nome)
+
+    # Redirecione de volta ao perfil do vendedor após a atualização
+    return redirect(url_for('sellers.perfil_vendedor', nome=nome))
+# ...
+@bp.route('/<nome>/atualizar_sistema_reset', methods=['POST'])
+def atualizar_sistema_reset(nome):
+    # Adicione aqui a lógica de atualização do sistema usando a função updateRanking()
+    updateRanking(nome, reset=True)
 
     # Redirecione de volta ao perfil do vendedor após a atualização
     return redirect(url_for('sellers.perfil_vendedor', nome=nome))
