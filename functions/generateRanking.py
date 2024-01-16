@@ -6,7 +6,10 @@ import datetime
 from pymongo import MongoClient
 import copy
 import datetime
+import pytz
 
+fuso_horario_brasil = pytz.timezone('America/Sao_Paulo')
+# Obtendo o fuso horário do Brasil
 def getDocumentOfTimeAndUrl(base_url, db, reset, year, month):
     if not year or not month:
         today = datetime.date.today()
@@ -58,7 +61,7 @@ def get_current_month_data(base_url, headers, db, updater = 'Gerencia',reset = F
         documentOfTime = generate_ranking(documentOfTime)
         # documentOfTime = generateRelatoryOfUpdate(documentOfTime, staticDocumentOfPast)
         # Atualize o documento no MongoDB
-        documentOfTime['lastUpdate'] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        documentOfTime['lastUpdate'] = datetime.datetime.now(fuso_horario_brasil).strftime("%d/%m/%Y %H:%M:%S")
         documentOfTime['updatedBy'] = updater
         
         db.update_one({"data": documentOfTime["data"]}, {"$set": documentOfTime}, upsert=True)

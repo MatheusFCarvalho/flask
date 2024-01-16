@@ -114,7 +114,7 @@ def atualizar_sistema(nome):
     updateRanking(nome)
 
     # Redirecione de volta ao perfil do vendedor após a atualização
-    return redirect(url_for('sellers.perfil_vendedor', nome=nome))
+    return redirect(url_for('sellers.perfil_vendedor', nome=nome, isPacific='competitivo'))
 # ...
 @bp.route('/<nome>/atualizar_sistema_reset', methods=['POST'])
 def atualizar_sistema_reset(nome):
