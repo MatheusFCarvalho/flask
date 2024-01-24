@@ -1,3 +1,4 @@
+from flask import request, redirect, url_for
 from functions.examples import getDateSlashed
 from functions.generateRanking import updateRanking, generateSpecificRanking
 from flask import render_template, Blueprint, request
@@ -20,6 +21,9 @@ def perfil_vendedor(nome, isPacific='pacifico'):
 
     documento = vendedores_collection.find_one({'data': getDateSlashed()})
 
+    if documento is None:
+        updateRanking('automatic')
+        documento = vendedores_collection.find_one({'data': getDateSlashed()})
 
     if documento and nome in documento:
         # Se o nome do vendedor existe no documento, pegue os dados desse vendedor
@@ -43,7 +47,7 @@ def perfil_vendedor(nome, isPacific='pacifico'):
             'valter souza':'surf na praia é bom d++',
             'willian souza':'sistema novo?', 
             'luciana rocha':'cuidado com o fuá',
-            'tatiane brockyeld':'hmmm coquinha gelada bom d++++',
+            'tatiane brockveld':'hmmm coquinha gelada bom d++++',
         }
 
 
@@ -100,12 +104,14 @@ def admin(year=None, month=None):
     vendedores_collection = db['vendedores']
 
     documento = vendedores_collection.find_one({"data": formated_date})
+    if documento is None:
+        updateRanking('automatic')
+
     dados_vendedores = getDadosVendedoresFromDocumentoForAdmin(documento)
     updateInfo = {'lastUpdate':documento['lastUpdate'], 'updatedBy': documento['updatedBy']}
                 
     return render_template('admin.html',updateInfo=updateInfo, dados_vendedores=dados_vendedores)
 
-from flask import request, redirect, url_for
 
 # ...
 @bp.route('/<nome>/atualizar_sistema', methods=['POST', 'GET'])
