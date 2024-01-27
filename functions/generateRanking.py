@@ -43,7 +43,7 @@ def get_current_month_data(base_url, headers, db, updater = 'Gerencia',reset = F
         data = response.json()
         allPedidos = data['ListPedidos']
         # documentOfTime = {'data': f'{year}/{formatted_month}', 'pedidosId':[], 'clientesDb':exampleOfClientesDb}
-        
+                
         for pedido in allPedidos:
             nroPedido = pedido['Nro']
             clientName = pedido['ClienteNome']
@@ -63,7 +63,7 @@ def get_current_month_data(base_url, headers, db, updater = 'Gerencia',reset = F
         # Atualize o documento no MongoDB
         documentOfTime['lastUpdate'] = datetime.datetime.now(fuso_horario_brasil).strftime("%d/%m/%Y %H:%M:%S")
         documentOfTime['updatedBy'] = updater
-        
+        import ipdb; ipdb.set_trace() 
         db.update_one({"data": documentOfTime["data"]}, {"$set": documentOfTime}, upsert=True)
 
         return "Dados coletados, tratados e atualizados com sucesso."
