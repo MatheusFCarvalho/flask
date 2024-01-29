@@ -33,7 +33,7 @@
                     </div>
                     <div class="col-md-4 border-right border-primary">
                         <select class="form-control" id="selectMes" name="meses" onchange="changeData()">
-                            <option value="">Selecione um mês</option>
+                            <!-- <option value="">Selecione um mês</option> -->
                             {% for mes in mesesDisponiveis %}
                                 <option value="{{ mes }}">{{ mes }}</option>
                             {% endfor %}
@@ -64,7 +64,19 @@
                             <span>Atualizado em: {{ updateInfo['lastUpdate'] }}</span>
                         </form>
                     </div>
-                {% endif %}
+                    {% endif %}
+                    <div class="col-md-4">
+                        <p>Cliente não atendido por você este mês: <a data-toggle="collapse" href="#clientesNotCollapse" aria-expanded="false" aria-controls="clientesNotCollapse">({{ qtdClientesNaoAtendidos }})</a></p>
+                        <div class="collapse" id="clientesNotCollapse">
+                            <ul>
+                                {% for chave in clientesNaoAtendidos %}
+                                <li>
+                                    {{ chave }}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div> 
+                    </div>    
                 </div>
             </div>
         </div>
@@ -114,6 +126,7 @@
                 document.getElementById('dadosVendedor').style.display = 'none';
             }
         }
+        changeData()
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
