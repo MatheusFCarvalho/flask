@@ -147,18 +147,20 @@ def generate_ranking(data):
     ranking_porteiro = []
     ranking_valor = []
     ranking_cliente = []
-    ignoreFields = ['data', 'pedidosId', 'clientesDb', 'lastUpdate', 'updatedBy', '_id']
+    ignoreFields = ['data', 'pedidosId', 'clientesDb', 'lastUpdate', 'updatedBy', '_id', 'tipo'],
 
     for vendedor, datas in data.items():
-        if vendedor in ignoreFields:
-            continue
-        # import ipdb; ipdb.set_trace()
-        
-        ranking_vendedor.append((vendedor, datas["qtdVendas"]))
-        ranking_porteiro.append((vendedor, datas["qtdPortas"]))
-        ranking_valor.append((vendedor, datas["totalVendido"]))
-        ranking_cliente.append((vendedor, len(datas["clientes"])))
-
+        if vendedor not in ignoreFields:
+            
+            try:
+                ranking_vendedor.append((vendedor, datas["qtdVendas"]))
+                ranking_porteiro.append((vendedor, datas["qtdPortas"]))
+                ranking_valor.append((vendedor, datas["totalVendido"]))
+                ranking_cliente.append((vendedor, len(datas["clientes"])))
+            except TypeError:
+                print('typeError on ranking', vendedor, ' - ', datas)
+            except KeyError:
+                print('keyerror')
 
     # Ordenar as listas de acordo com os diferentes critérios
     ranking_vendedor.sort(key=lambda x: x[1], reverse=True)

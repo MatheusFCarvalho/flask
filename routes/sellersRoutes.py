@@ -19,8 +19,8 @@ def perfil_vendedor(nome, isPacific='pacifico'):
     # Obter o documento do banco de dados
 
     documento = vendedores_collection.find_one({'data': getDateSlashed()})
-    clientesTotaisDoc = vendedores_collection.find_one({'tipo':'clientesAtuais', 'vendedor':nome})
-    clientesTotais = clientesTotaisDoc['clientes']
+    # clientesTotaisDoc = vendedores_collection.find_one({'tipo':'clientesAtuais', 'vendedor':nome})
+    # clientesTotais = clientesTotaisDoc['clientes']
 
     if documento and nome in documento:
         # Se o nome do vendedor existe no documento, pegue os dados desse vendedor
@@ -33,8 +33,8 @@ def perfil_vendedor(nome, isPacific='pacifico'):
         qtdClient = len(clientes)
         
         clientesDbOfSeller = {cliente: clientesDb.get(cliente) for cliente in clientes}
-        clientesNaoAtendidos = [cliente for cliente in clientesTotais if cliente not in clientes]
-        qtdClientesNaoAtendidos = len(clientesNaoAtendidos)
+        # clientesNaoAtendidos = [cliente for cliente in clientesTotais if cliente not in clientes]
+        # qtdClientesNaoAtendidos = len(clientesNaoAtendidos)
         # Passe os dados como um dicionário com as chaves correspondentes
 
         fraseSystem = {
@@ -69,8 +69,8 @@ def perfil_vendedor(nome, isPacific='pacifico'):
                     "qtdPortas": vendedor.get("qtdPortas", 0),
                     "qtdClientes": qtdClient,
                     "clientesName": clientes,
-                    "clientesNaoAtendidos": clientesNaoAtendidos,
-                    "qtdClientesNaoAtendidos":qtdClientesNaoAtendidos,
+                    # "clientesNaoAtendidos": clientesNaoAtendidos,
+                    # "qtdClientesNaoAtendidos":qtdClientesNaoAtendidos,
                     "clientesDb": clientesDbOfSeller,
                     "rank_vendedor": vendedor.get("rank_vendedor", 0),
                     "rank_porteiro": vendedor.get("rank_porteiro", 0),
