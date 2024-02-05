@@ -4,10 +4,12 @@
     <title>Perfil do Vendedor</title>
     <!-- Adicione o link para o Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
 </head>
 <body>
-    <div class="container mt-4">
+    <div style="display: flex;">
+        <div hx-get="/sellers/getNoticias/" hx-trigger="load"></div>
+        <div class="container mt-4">
         <div class="card">
             <div class="card-header">
                 <h1 class="card-title">Perfil {{ nome }}</h1>
@@ -35,7 +37,7 @@
                         <select class="form-control" id="selectMes" name="meses" onchange="changeData()">
                             <!-- <option value="">Selecione um mês</option> -->
                             {% for mes in mesesDisponiveis %}
-                                <option value="{{ mes }}">{{ mes }}</option>
+                            <option value="{{ mes }}">{{ mes }}</option>
                             {% endfor %}
                         </select>
                         <div id="dadosVendedor" style="display: none;">
@@ -80,6 +82,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
     <!-- Adicione o link para o Bootstrap JS e jQuery se necessário -->
     <script>

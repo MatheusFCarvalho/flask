@@ -1,0 +1,11 @@
+<div style=" width: 20vw; gap: 15px; background-color: darkgrey; display: flex; flex-direction: column;">
+    <h2>Noticias</h2>
+    {% for noticia in noticias %}
+    <div style="padding: 5px; display: flex; flex-direction: column; background-color: lightgrey;">
+        <h5>{{  noticia.titulo  }}</h5>
+        {% for conteudo in noticia.conteudos %}
+        <p>{{ conteudo }}</p>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>

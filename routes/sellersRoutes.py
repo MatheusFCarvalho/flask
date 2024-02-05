@@ -4,7 +4,7 @@ from flask import render_template, Blueprint, request
 from pymongo import MongoClient
 from functions.serializers import getDadosVendedoresFromDocumentoForAdmin, getMesesDisponiveis
 import datetime
-
+from flask import request, redirect, url_for
 bp = Blueprint('sellers', __name__)
 MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
 
@@ -19,8 +19,8 @@ def perfil_vendedor(nome, isPacific='pacifico'):
     # Obter o documento do banco de dados
 
     documento = vendedores_collection.find_one({'data': getDateSlashed()})
-    # clientesTotaisDoc = vendedores_collection.find_one({'tipo':'clientesAtuais', 'vendedor':nome})
-    # clientesTotais = clientesTotaisDoc['clientes']
+    clientesTotaisDoc = vendedores_collection.find_one({'tipo':'clientesAtuais', 'vendedor':nome})
+    clientesTotais = clientesTotaisDoc['clientes']
 
     if documento and nome in documento:
         # Se o nome do vendedor existe no documento, pegue os dados desse vendedor
@@ -33,8 +33,8 @@ def perfil_vendedor(nome, isPacific='pacifico'):
         qtdClient = len(clientes)
         
         clientesDbOfSeller = {cliente: clientesDb.get(cliente) for cliente in clientes}
-        # clientesNaoAtendidos = [cliente for cliente in clientesTotais if cliente not in clientes]
-        # qtdClientesNaoAtendidos = len(clientesNaoAtendidos)
+        clientesNaoAtendidos = [cliente for cliente in clientesTotais if cliente not in clientes]
+        qtdClientesNaoAtendidos = len(clientesNaoAtendidos)
         # Passe os dados como um dicionário com as chaves correspondentes
 
         fraseSystem = {
@@ -69,8 +69,8 @@ def perfil_vendedor(nome, isPacific='pacifico'):
                     "qtdPortas": vendedor.get("qtdPortas", 0),
                     "qtdClientes": qtdClient,
                     "clientesName": clientes,
-                    # "clientesNaoAtendidos": clientesNaoAtendidos,
-                    # "qtdClientesNaoAtendidos":qtdClientesNaoAtendidos,
+                    "clientesNaoAtendidos": clientesNaoAtendidos,
+                    "qtdClientesNaoAtendidos":qtdClientesNaoAtendidos,
                     "clientesDb": clientesDbOfSeller,
                     "rank_vendedor": vendedor.get("rank_vendedor", 0),
                     "rank_porteiro": vendedor.get("rank_porteiro", 0),
@@ -109,7 +109,16 @@ def admin(year=None, month=None):
                 
     return render_template('admin.html',updateInfo=updateInfo, dados_vendedores=dados_vendedores)
 
-from flask import request, redirect, url_for
+@bp.route('/getNoticias/', methods=['GET'])
+def renderNoticias():
+    noticias = [{'titulo':'Mudança no preço de espelhos com Led e instalação.', 
+                 'conteudos': ['Estamos cobrando 100 reais fixos pelo perfil que é usado nos led(até 6 metros, a partir disso é cobrado mais 1 perfil)', 
+                               'Instalado agora adicionado serviço de instalação R$180']},
+                {'titulo': 'Projetos de meia chapa e chapa inteira para venda!',
+                 'conteudos':['Para acessar os projetos deve fazer o seguinte caminho -> LINHAS: vidro comum. -> MODELO: chapas', 'e prontinho!'] 
+
+                }]
+    return render_template('avisos.html', noticias=noticias)
 
 # ...
 @bp.route('/<nome>/atualizar_sistema', methods=['POST', 'GET'])
