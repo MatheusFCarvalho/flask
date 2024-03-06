@@ -125,15 +125,18 @@ def renderNoticias():
 def atualizar_sistema(nome):
     # Adicione aqui a lógica de atualização do sistema usando a função updateRanking()
     updateRanking(nome)
-
+    if nome == 'admin':
+        return redirect(url_for('sellers.admin'))
     # Redirecione de volta ao perfil do vendedor após a atualização
     return redirect(url_for('sellers.perfil_vendedor', nome=nome, isPacific='competitivo'))
 # ...
-@bp.route('/<nome>/atualizar_sistema_reset', methods=['POST'])
+@bp.route('/<nome>/atualizar_sistema_reset', methods=['POST', 'GET'])
 def atualizar_sistema_reset(nome):
     # Adicione aqui a lógica de atualização do sistema usando a função updateRanking()
     updateRanking(nome, reset=True)
 
+    if nome == 'admin':
+        return redirect(url_for('sellers.admin'))
     # Redirecione de volta ao perfil do vendedor após a atualização
     return redirect(url_for('sellers.perfil_vendedor', nome=nome))
 
