@@ -109,18 +109,6 @@ def admin(year=None, month=None):
                 
     return render_template('admin.html',updateInfo=updateInfo, dados_vendedores=dados_vendedores)
 
-@bp.route('/getNoticias/', methods=['GET'])
-def renderNoticias():
-    noticias = [{'titulo':'Mudança no preço de espelhos com Led e instalação.', 
-                 'conteudos': ['Estamos cobrando 100 reais fixos pelo perfil que é usado nos led(até 6 metros, a partir disso é cobrado mais 1 perfil)', 
-                               'Instalado agora adicionado serviço de instalação R$180']},
-                {'titulo': 'Projetos de meia chapa e chapa inteira para venda!',
-                 'conteudos':['Para acessar os projetos deve fazer o seguinte caminho -> LINHAS: vidro comum. -> MODELO: chapas', 'e prontinho!'] 
-
-                }]
-    return render_template('avisos.html', noticias=noticias)
-
-# ...
 @bp.route('/<nome>/atualizar_sistema', methods=['POST', 'GET'])
 def atualizar_sistema(nome):
     # Adicione aqui a lógica de atualização do sistema usando a função updateRanking()
