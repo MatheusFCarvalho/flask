@@ -1,25 +1,19 @@
-from functions.examples import getDateSlashed
-from functions.generateRanking import updateRanking, generateSpecificRanking
 from flask import render_template, Blueprint, request
 from pymongo import MongoClient
-from functions.serializers import getDadosVendedoresFromDocumentoForAdmin, getMesesDisponiveis
+from . import getDadosVendedoresFromDocumentoForAdmin, getMesesDisponiveis, getDateSlashed, vendedoresCollection
+from functions.generateRanking import updateRanking, generateSpecificRanking
 import datetime
 from flask import request, redirect, url_for
+
 bp = Blueprint('sellers', __name__)
-MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
 
 @bp.route('/<nome>', methods=['GET', 'POST'])
 @bp.route('/<nome>/<isPacific>', methods=['GET', 'POST'])
 def perfil_vendedor(nome, isPacific='pacifico'):
-    
-    # Conectar ao banco de dados MongoDB
-    client = MongoClient(MONGO_URI)
-    db = client['pequi']
-    vendedores_collection = db['vendedores']
     # Obter o documento do banco de dados
 
-    documento = vendedores_collection.find_one({'data': getDateSlashed()})
-    clientesTotaisDoc = vendedores_collection.find_one({'tipo':'clientesAtuais', 'vendedor':nome})
+    documento = vendedoresCollection.find_one({'data': getDateSlashed()})
+    clientesTotaisDoc = vendedoresCollection.find_one({'tipo':'clientesAtuais', 'vendedor':nome})
     clientesTotais = clientesTotaisDoc['clientes']
 
     if documento and nome in documento:
@@ -37,17 +31,6 @@ def perfil_vendedor(nome, isPacific='pacifico'):
         qtdClientesNaoAtendidos = len(clientesNaoAtendidos)
         # Passe os dados como um dicionário com as chaves correspondentes
 
-        fraseSystem = {
-            'michelle boschetti':'calma na alma que passa',
-            'beatriz boschetti':'obrigado meu Deus pelo cafézinho de cada dia',
-            'bianca boschetti':'assina aqui por favor',
-            'fernando boschetti':'golfão gti: https://www.youtube.com/watch?v=AA3__qlakw4',
-            'valter souza':'surf na praia é bom d++',
-            'willian souza':'sistema novo?', 
-            'luciana rocha':'cuidado com o fuá',
-            'tatiane brockyeld':'hmmm coquinha gelada bom d++++',
-        }
-
 
         senha = request.form.get('senha')
         # if request.method == 'POST':
@@ -58,8 +41,6 @@ def perfil_vendedor(nome, isPacific='pacifico'):
         daysLeft = 30 - int(today.day)
         
         frase = "De grão em grão de areia se faz uma chapa de vidro!"
-        if nome in fraseSystem:
-            frase = fraseSystem[nome]
 
         dados_vendedor = {
                     "isPacific":isPacific,
@@ -99,37 +80,26 @@ def admin(year=None, month=None):
     else:
         formated_date = f"{year:04d}/{month:02d}"
 
-    client = MongoClient(MONGO_URI)
-    db = client['pequi']
-    vendedores_collection = db['vendedores']
+    
 
-    documento = vendedores_collection.find_one({"data": formated_date})
+    documento = vendedoresCollection.find_one({"data": formated_date})
     dados_vendedores = getDadosVendedoresFromDocumentoForAdmin(documento)
     updateInfo = {'lastUpdate':documento['lastUpdate'], 'updatedBy': documento['updatedBy']}
                 
     return render_template('admin.html',updateInfo=updateInfo, dados_vendedores=dados_vendedores)
 
-@bp.route('/getNoticias/', methods=['GET'])
-def renderNoticias():
-    noticias = [{'titulo':'Mudança no preço de espelhos com Led e instalação.', 
-                 'conteudos': ['Estamos cobrando 100 reais fixos pelo perfil que é usado nos led(até 6 metros, a partir disso é cobrado mais 1 perfil)', 
-                               'Instalado agora adicionado serviço de instalação R$180']},
-                {'titulo': 'Projetos de meia chapa e chapa inteira para venda!',
-                 'conteudos':['Para acessar os projetos deve fazer o seguinte caminho -> LINHAS: vidro comum. -> MODELO: chapas', 'e prontinho!'] 
-
-                }]
-    return render_template('avisos.html', noticias=noticias)
-
-# ...
 @bp.route('/<nome>/atualizar_sistema', methods=['POST', 'GET'])
 def atualizar_sistema(nome):
+
+
+    
     # Adicione aqui a lógica de atualização do sistema usando a função updateRanking()
     updateRanking(nome)
     if nome == 'admin':
         return redirect(url_for('sellers.admin'))
     # Redirecione de volta ao perfil do vendedor após a atualização
     return redirect(url_for('sellers.perfil_vendedor', nome=nome, isPacific='competitivo'))
-# ...
+
 @bp.route('/<nome>/atualizar_sistema_reset', methods=['POST', 'GET'])
 def atualizar_sistema_reset(nome):
     # Adicione aqui a lógica de atualização do sistema usando a função updateRanking()

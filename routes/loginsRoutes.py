@@ -1,5 +1,4 @@
 from flask import request, jsonify
-from pymongo.mongo_client import MongoClient
 import jwt
 import datetime
 import bcrypt
@@ -8,18 +7,9 @@ from verifiers.verifyToken import token_required
 from bson.objectid import ObjectId
 from flask_cors import CORS
 from dotenv import load_dotenv
-import os
-
+from . import usuariosCollection
 # Carregue as variáveis de ambiente do arquivo .env
 load_dotenv()
-
-MONGO_URI = os.getenv("MONGO_URI")
-
-# Conectar ao MongoDB
-client = MongoClient(MONGO_URI)
-
-db = client['pequi']
-collection = db['usuarios']
 
 bp = Blueprint('logs', __name__)
 CORS(bp)
@@ -30,7 +20,7 @@ def registrar_usuario():
     data = request.get_json()
 
     # Verifique se o usuário já existe
-    if collection.find_one({'username': data['username']}):
+    if usuariosCollection.find_one({'username': data['username']}):
         return jsonify({'message': 'Nome de usuário já está em uso!'}), 400
 
 
@@ -38,7 +28,7 @@ def registrar_usuario():
     hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
     # Crie um novo usuário com a senha hasheada
     data['password'] = hashed_password.decode('utf-8')
-    collection.insert_one(data)
+    usuariosCollection.insert_one(data)
 
     return jsonify({'message': 'Usuário registrado com sucesso!'}), 201
 
@@ -47,7 +37,7 @@ def registrar_usuario():
 def login():
     data = request.get_json()
 
-    usuario = collection.find_one({'username': data['username']})
+    usuario = usuariosCollection.find_one({'username': data['username']})
     if usuario and bcrypt.checkpw(data['password'].encode('utf-8'), usuario['password'].encode('utf-8')):
         usuario['_id'] = str(usuario['_id'])
         token = jwt.encode({
@@ -67,7 +57,7 @@ def login():
 @bp.route('/getMyUser/<userId>')
 @token_required
 def getInfoUser(userId):
-    user = collection.find_one({'_id':ObjectId(userId)})
+    user = usuariosCollection.find_one({'_id':ObjectId(userId)})
     user['id'] = user.pop('_id')
     user['id'] = str(user['id'])
     user.pop('password')
