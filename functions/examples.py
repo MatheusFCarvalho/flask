@@ -19,13 +19,5 @@ exampleOfClientesDb = {
     'japavidros':0
 }
 
-def getDateSlashed():
-    today = datetime.date.today()
-    year = today.year
-    month = today.month
-    formatted_month = f'{month:02d}'
-
-    return f'{year}/{formatted_month}'
-
 
 
