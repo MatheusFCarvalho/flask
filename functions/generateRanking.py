@@ -1,12 +1,12 @@
-from myvetro import getLoginWvetro
-# from examples import exampleOfClientesDb    
+from myvetro import getTokenWvetro
 from pymongo.mongo_client import MongoClient
 import requests
 import datetime
 from pymongo import MongoClient
-import copy
 import datetime
 import pytz
+# from examples import exampleOfClientesDb    
+# import copy
 
 fuso_horario_brasil = pytz.timezone('America/Sao_Paulo')
 # Obtendo o fuso horário do Brasil
@@ -193,7 +193,7 @@ def generate_ranking(data):
 
 def updateRanking(nome, reset = False):
     base_url = 'https://sistema.wvetro.com.br/wvetro/rest/api/'
-    token = getLoginWvetro.getTokenWvetro()
+    token = getTokenWvetro()
     headers = {'token': token}
     MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
     client = MongoClient(MONGO_URI)
@@ -205,7 +205,7 @@ def updateRanking(nome, reset = False):
     
 def generateSpecificRanking(nome, year, month):
     base_url = 'https://sistema.wvetro.com.br/wvetro/rest/api/'
-    token = getLoginWvetro.getTokenWvetro()
+    token = getTokenWvetro()
     headers = {'token': token}
     MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
     client = MongoClient(MONGO_URI)
@@ -219,7 +219,7 @@ def generateSpecificRanking(nome, year, month):
 if __name__ == "__main__":
     # base_url = 'https://sistema.wvetro.com.br/wvetro/rest/api/'
     # # token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVc2VyIjoibWF0aGV1cyBmbG9yZW50aW5vIGRlIGNhcnZhbGhvIiwiTGljZW5zZSI6IjI0NzkiLCJleHAiOjE2OTk0NzMyMDIsImlhdCI6MTY5OTQ3MzIwMiwianRpIjoiYmUwZTM3ZmMtMjQ0MC00YTFkLWI4NjktYjM1YmIxZTM0MjlhIiwiUGFzc3dvcmQiOiIxMjM0NTYifQ.NMf6vNrMf100hhClbO_2pfLKWWAvuWLqI0spWtGE4Js'
-    # token = getLoginWvetro.getTokenWvetro()
+    # token = getTokenWvetro()
     # headers = {'token': token}
     # MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
     # client = MongoClient(MONGO_URI)

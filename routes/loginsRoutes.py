@@ -1,73 +1,54 @@
-from flask import request, jsonify
-import jwt
-import datetime
-import bcrypt
-from flask import request, jsonify, request, Blueprint
-from verifiers.verifyToken import token_required
-from bson.objectid import ObjectId
-from flask_cors import CORS
+from datetime import date
+from flask import render_template, redirect
+from flask import jsonify, request, Blueprint
+from verifiers.verifyToken import mySession_required
 from dotenv import load_dotenv
-from . import usuariosCollection
+# from bson.objectid import ObjectId
+# from . import usuariosCollection
+# import jwt
+# import datetime
+# import bcrypt
+# from flask_cors import CORS
 # Carregue as variáveis de ambiente do arquivo .env
 load_dotenv()
 
-bp = Blueprint('logs', __name__)
-CORS(bp)
+regi_bp = Blueprint('register', __name__)
+auth_bp = Blueprint('logs', __name__)
+# CORS(bp)
 
 # Rota para cadastro de usuário
-@bp.route('/registro', methods=['POST'])
+@regi_bp.route('/register', methods=['POST'])
 def registrar_usuario():
-    data = request.get_json()
 
-    # Verifique se o usuário já existe
-    if usuariosCollection.find_one({'username': data['username']}):
-        return jsonify({'message': 'Nome de usuário já está em uso!'}), 400
+    return jsonify({'message': 'Usuário nao registrado com sucesso!'}), 201
 
-
-    # Faça o hash da senha
-    hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
-    # Crie um novo usuário com a senha hasheada
-    data['password'] = hashed_password.decode('utf-8')
-    usuariosCollection.insert_one(data)
-
-    return jsonify({'message': 'Usuário registrado com sucesso!'}), 201
-
-# Rota para fazer login e obter um token JWT (mantida da implementação anterior) 
-@bp.route('/', methods=['POST'])
+@auth_bp.route('/', methods=['GET'])
+@auth_bp.route('/login/', methods=['GET'])
 def login():
-    data = request.get_json()
+    return render_template('auth/login.html')
 
-    usuario = usuariosCollection.find_one({'username': data['username']})
-    if usuario and bcrypt.checkpw(data['password'].encode('utf-8'), usuario['password'].encode('utf-8')):
-        usuario['_id'] = str(usuario['_id'])
-        token = jwt.encode({
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=5),
-            'iat':datetime.datetime.utcnow(),
-            'sub': usuario['_id'],
-             }, key='hellokitty', algorithm='HS256')
-
-        userId = str(usuario['_id'])
-
-        return jsonify({'token': token, 'userId':userId}), 201
-
-    return jsonify({'message': 'Credenciais inválidas'}), 401
-# Rota protegida que requer autenticação (mantida da implementação anterior)
+@regi_bp.route('/login/post/', methods='[POST]')
+def loginPost():
+    hoje = date.today()
+    hojeStr = hoje.strftime('%d%m%Y')
+    dictForm = request.form.to_dict()
+    dictForm['idDia'] = hojeStr
+    
+    return render_template('login/post.html', dictInfo=dictForm)
 
 
-@bp.route('/getMyUser/<userId>')
-@token_required
+@auth_bp.route('/getMyUser/<userId>')
+@mySession_required
 def getInfoUser(userId):
-    user = usuariosCollection.find_one({'_id':ObjectId(userId)})
-    user['id'] = user.pop('_id')
-    user['id'] = str(user['id'])
-    user.pop('password')
-    return jsonify({'userInfo': user})
+    infoUser = getInfoUser(userId)
+    return jsonify({'userInfo': infoUser})
 
 
-@bp.route('/protegida')
-@token_required
+@auth_bp.route('/protegida')
+@mySession_required
 def protegida():
     return jsonify({'message': 'Rota protegida!'})
 
 if __name__ == '__main__':
-    bp.run(debug=True)
+    auth_bp.run(debug=True)
+    regi_bp.run(debug=True)

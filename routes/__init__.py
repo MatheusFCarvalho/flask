@@ -1,13 +1,22 @@
 import requests
 import datetime
 from pymongo import MongoClient
+from classes.repository import RepositorierOfAll
+from dotenv import load_dotenv
+import os
+load_dotenv()
+MONGO_URI = os.getenv('MONGO_URI')
+DATABASE = os.getenv('DATABASE')
 
-MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
+
+# print(DATABASE)
 client = MongoClient(MONGO_URI)
-db = client['pequi']
+db = client[DATABASE]
+repo = RepositorierOfAll(db)
 
-vendedoresCollection = db['vendedores']
-usuariosCollection = db['usuarios']
+vendedoresCollection = repo.adicionarCollection('vendedores')
+
+# usuariosCollection = repo.adicionarCollection('') 
 
 
 def getMesesDisponiveis(nome):
@@ -52,12 +61,6 @@ def getDadosVendedoresFromDocumentoForAdmin(documento):
         dados_vendedores = sorted(dados_vendedores, key=lambda x: x['rank_value'], reverse=False)[1:]
         return dados_vendedores
 
-
-def getTokenWvetro():
-    url ='https://sistema.wvetro.com.br/wvetro/rest/api/Integracao/ValidarUsuario?Licencaid=2479&Secusername=Matheus Florentino de Carvalho&Secuserpassword=123456'
-    response = requests.get(url)
-    responseData = response.json()
-    return responseData['ValidaUsuario']['token']
 
 def getDateSlashed():
     today = datetime.date.today()

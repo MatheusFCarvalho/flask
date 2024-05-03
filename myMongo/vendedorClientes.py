@@ -1,11 +1,33 @@
 from pymongo.mongo_client import MongoClient
-MONGO_URI = "mongodb+srv://matheusfcarvalho2001:3648@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
-# "mongodb+srv://matheusfcarvalho2001:<password>@cluster0.rioem39.mongodb.net/?retryWrites=true&w=majority"
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
+MONGO_URI = os.getenv('MONG_URI')
+DATABASE = os.getenv('DATABASE')
+
 client = MongoClient(MONGO_URI)
 
-db = client['pequi']
+db = client[DATABASE]
 
 collection = db['vendedores']
+
+class RepositorierOfAll:
+    def __init__(self, database):
+        self.database = database
+        self.collectionsDict = dict()
+        self.collectionsArr = list()
+
+    def adicionarCollection(self, keyOfCollection):
+        collection = self.database[keyOfCollection]
+        self.collectionsDict[keyOfCollection] = collection
+        self.collectionsArr.append(collection)
+        return collection
+    def adicionarDocumento(self, documento, guiaCollection = 0):
+        if guiaCollection.isinstance(str):
+            self.collectionsDict[guiaCollection].insert_one(documento)
+        elif guiaCollection.isinstance(int):
+            self.collectionsArr[guiaCollection].insert_one(documento)
 
 def adicionar_clientes(vendedor, novos_clientes):
     # Atualiza o documento específico usando find_one_and_update

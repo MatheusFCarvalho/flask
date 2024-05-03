@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-center mb-4">Painel de Administração</h1>
+        <div class="flex justify-center mb-4">
+            <div hx-get="/admin" hx-trigger="load" hx-target="#content" hx-swap="outerHTML">
+                Carregar Dados Atuais
+            </div>
+        </div>
+        <div id="content" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <!-- O conteúdo atualizado será carregado aqui -->
+        </div>
+        <div class="flex justify-between items-center">
+            <div class="flex gap-2">
+                <input type="number" placeholder="Ano" class="border p-2" id="yearInput">
+                <input type="number" placeholder="Mês" class="border p-2" id="monthInput">
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        hx-get="/admin"
+                        hx-include="#yearInput, #monthInput"
+                        hx-params="year, month"
+                        hx-target="#content"
+                        hx-swap="outerHTML">
+                    Atualizar
+                </button>
+            </div>
+            <div>
+                <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                        hx-post="/admin/atualizar_sistema_reset"
+                        hx-target="#content"
+                        hx-swap="outerHTML">
+                    Resetar Sistema
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

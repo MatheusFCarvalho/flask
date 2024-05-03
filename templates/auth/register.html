@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro</title>
+</head>
+<body>
+    <form method="POST" hx-post="/auth/register" hx-target="#response">
+        <label for="username">Nome de usuário:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="password">Senha:</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="sector">Setor:</label>
+        <select id="sector" name="sector" required>
+            <option value="vendedor">Vendedor</option>
+            <option value="espectador">Espectador</option>
+            <option value="gerente">Gerente</option>
+        </select>
+
+        <button type="submit">Registrar</button>
+    </form>
+    <div id="response"></div>
+</body>
+</html>

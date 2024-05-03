@@ -1,20 +1,26 @@
 from flask import render_template, Blueprint, request
-from pymongo import MongoClient
-from . import getDadosVendedoresFromDocumentoForAdmin, getMesesDisponiveis, getDateSlashed, vendedoresCollection
+from . import getDadosVendedoresFromDocumentoForAdmin, getMesesDisponiveis, getDateSlashed, vendedoresCollection 
 from functions.generateRanking import updateRanking, generateSpecificRanking
 import datetime
 from flask import request, redirect, url_for
+# from pymongo import MongoClient
 
-bp = Blueprint('sellers', __name__)
+sell_bp = Blueprint('sellers', __name__)
 
-@bp.route('/<nome>', methods=['GET', 'POST'])
-@bp.route('/<nome>/<isPacific>', methods=['GET', 'POST'])
+@sell_bp.route('/<nome>', methods=['GET', 'POST'])
+@sell_bp.route('/<nome>/<isPacific>', methods=['GET', 'POST'])
 def perfil_vendedor(nome, isPacific='pacifico'):
     # Obter o documento do banco de dados
 
     documento = vendedoresCollection.find_one({'data': getDateSlashed()})
+    # try:
     clientesTotaisDoc = vendedoresCollection.find_one({'tipo':'clientesAtuais', 'vendedor':nome})
-    clientesTotais = clientesTotaisDoc['clientes']
+        # clientesTotais = clientesTotaisDoc['clientes']
+    clientesTotais = clientesTotaisDoc.get('clientes', False)
+    if clientesTotais == False:
+        vendedoresCollection.insert_one({'tipo': 'clientesAtuais', 'vendedor': nome, 'clientes':[] })
+        clientesTotais = []
+    # except TypeError:
 
     if documento and nome in documento:
         # Se o nome do vendedor existe no documento, pegue os dados desse vendedor
@@ -36,7 +42,6 @@ def perfil_vendedor(nome, isPacific='pacifico'):
         # if request.method == 'POST':
             # if senha == senhaSystem.get(nome):
         mesesDisponiveis, mesesData = getMesesDisponiveis(nome)
-        # he wake up early nine he
         today = datetime.date.today()
         daysLeft = 30 - int(today.day)
         
@@ -72,8 +77,8 @@ def perfil_vendedor(nome, isPacific='pacifico'):
     
 
 
-@bp.route('/admin', methods=['GET'])
-@bp.route('/admin/<int:year>/<int:month>', methods=['GET'])
+@sell_bp.route('/admin', methods=['GET'])
+@sell_bp.route('/admin/<int:year>/<int:month>', methods=['GET'])
 def admin(year=None, month=None):
     if year is None or month is None:
         formated_date = getDateSlashed()
@@ -86,9 +91,10 @@ def admin(year=None, month=None):
     dados_vendedores = getDadosVendedoresFromDocumentoForAdmin(documento)
     updateInfo = {'lastUpdate':documento['lastUpdate'], 'updatedBy': documento['updatedBy']}
                 
-    return render_template('admin.html',updateInfo=updateInfo, dados_vendedores=dados_vendedores)
+    return render_template('admin/index.html',updateInfo=updateInfo, dados_vendedores=dados_vendedores)
+    # return render_template('admin.html',updateInfo=updateInfo, dados_vendedores=dados_vendedores)
 
-@bp.route('/<nome>/atualizar_sistema', methods=['POST', 'GET'])
+@sell_bp.route('/<nome>/atualizar_sistema', methods=['POST', 'GET'])
 def atualizar_sistema(nome):
 
 
@@ -100,7 +106,7 @@ def atualizar_sistema(nome):
     # Redirecione de volta ao perfil do vendedor após a atualização
     return redirect(url_for('sellers.perfil_vendedor', nome=nome, isPacific='competitivo'))
 
-@bp.route('/<nome>/atualizar_sistema_reset', methods=['POST', 'GET'])
+@sell_bp.route('/<nome>/atualizar_sistema_reset', methods=['POST', 'GET'])
 def atualizar_sistema_reset(nome):
     # Adicione aqui a lógica de atualização do sistema usando a função updateRanking()
     updateRanking(nome, reset=True)
@@ -110,7 +116,7 @@ def atualizar_sistema_reset(nome):
     # Redirecione de volta ao perfil do vendedor após a atualização
     return redirect(url_for('sellers.perfil_vendedor', nome=nome))
 
-@bp.route('/<nome>/atualizar_sistema/specific/<year>/<month>', methods=['POST'])
+@sell_bp.route('/<nome>/atualizar_sistema/specific/<year>/<month>', methods=['POST'])
 def generate_specific_ranking(nome, year, month):
     # Adicione aqui a lógica de atualização do sistema usando a função updateRanking()
     generateSpecificRanking(nome= nome, year=year, month=month)

@@ -1,5 +1,5 @@
 import requests
-import pandas as pd
+# import pandas as pd
 
 base_url = 'https://sistema.wvetro.com.br/wvetro/rest/api/'
 
@@ -90,12 +90,12 @@ class Manager:
         return message 
 
                         # self.especificaCores[newCorNome] += float(metroquadrado)
-    def exportToExcel(self, file_name):
-        # Criando um DataFrame do pandas a partir do dicionário específicoCores
-        df = pd.DataFrame(list(self.especificaCores.items()), columns=['Cor', 'Metros Quadrados'])
-        df = df.sort_values(by='Metros Quadrados', ascending=False)
-        # Escrevendo o DataFrame em um arquivo Excel
-        df.to_excel(file_name, index=False)
+    # def exportToExcel(self, file_name):
+    #     # Criando um DataFrame do pandas a partir do dicionário específicoCores
+    #     df = pd.DataFrame(list(self.especificaCores.items()), columns=['Cor', 'Metros Quadrados'])
+    #     df = df.sort_values(by='Metros Quadrados', ascending=False)
+    #     # Escrevendo o DataFrame em um arquivo Excel
+    #     df.to_excel(file_name, index=False)
 
 
 
